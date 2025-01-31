@@ -1,5 +1,13 @@
 <script>
   let showHero = false;
+  let languages = [
+    { name: "🇬🇧 English", level: "C2", progress: 6, color: "green" },
+    { name: "🇺🇦 Ukrainian", level: "C2", progress: 6, color: "green" },
+    { name: "Russian", level: "C2", progress: 6, color: "green" },
+    { name: "🇩🇪 German", level: "B1", progress: 3, color: "yellow" },
+    { name: "🇨🇿 Czech", level: "A2", progress: 2, color: "yellow" },
+    { name: "🇨🇳 Chinese", level: "HSK2", progress: 2, color: "yellow" }
+  ];
 
   // Trigger fadeIn on mount
   import { onMount } from "svelte";
@@ -52,5 +60,24 @@
     aria-label="View My Work">
       View My Work
     </a>
+  </div>
+</section>
+
+<!-- Section with languages -->
+<section class="py-20 px-4 text-center">
+  <h2 class="text-3xl font-semibold mb-8">Languages</h2>
+  <div class="flex flex-col items-center space-y-6">
+    {#each languages as lang}
+      <div class="flex items-center space-x-4 w-full max-w-lg">
+        <span class="text-lg font-medium w-28 text-left">{lang.name}</span>
+        <div class="flex space-x-1 flex-1">
+          {#each Array(6).fill(0).map((_, i) => i) as i}
+            <div class="w-12 h-6 rounded-md shadow-md transition-all duration-300 {i < lang.progress ? `bg-${lang.color}-500` : `bg-${lang.color}-300 shadow-inner`}">
+            </div>
+          {/each}
+        </div>
+        <span class="text-lg font-medium w-8 text-right">{lang.level}</span>
+      </div>
+    {/each}
   </div>
 </section>
