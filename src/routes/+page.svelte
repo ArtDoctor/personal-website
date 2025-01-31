@@ -28,7 +28,7 @@
   </header>
 
   <section class="max-w-4xl">
-    <img src="/profile.png" alt="{name}" class="w-32 h-32 rounded-full border-4 border-blue-500 mb-4">
+    <img src="/avatar.png" alt="{name}" class="w-32 h-32 rounded-full border-4 border-blue-500 mb-4">
     <h2 class="text-3xl font-semibold">Hey there! I'm {name} 👋</h2>
     <p class="text-lg mt-3 text-gray-400">{title}</p>
     <p class="mt-4 text-gray-300 leading-relaxed">{description}</p>
