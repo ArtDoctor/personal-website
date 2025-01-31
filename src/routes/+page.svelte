@@ -1,45 +1,56 @@
 <script>
-    import { onMount } from 'svelte';
+  let showHero = false;
 
-    export let name = "Artem";
-    export let title = "Computational Physicist, Entrepreneur, and Lifelong Learner";
-    export let description = "I explore the intersection of physics, AI, and technology to build innovative solutions. Passionate about productivity, deep thinking, and making life smarter.";
-
-    let subscribers = "Join 260+ curious minds";
-
-    onMount(() => {
-    console.log("Welcome to Artem's website!");
-    });
-
-  import { writable } from 'svelte/store';
-  let email = writable("");
+  // Trigger fadeIn on mount
+  import { onMount } from "svelte";
+  onMount(() => {
+    showHero = true;
+  });
 </script>
 
-<style>
-  :global(body) {
-    @apply bg-gray-900 text-gray-200;
-  }
-</style>
+<section
+  class="flex flex-col md:flex-row items-center justify-center text-left py-20 transition-opacity duration-1000"
+  class:opacity-0={!showHero}
+  class:opacity-100={showHero}
+>
+  <div class="md:w-1/2 flex justify-center mb-8 md:mb-0">
+    <img src="/images/avatar.png" alt="Hero" class="h-64 w-64 md:h-96 md:w-96" />
+  </div>
+  <div class="md:w-1/2">
+    <h1
+      class="text-5xl md:text-7xl  font-bold
+         animate-fadeIn flex items-center"
+    >
+      <div class="bg-gradient-to-r from-violet-600 via-cyan-500 to-violet-600 bg-clip-text text-transparent">
+        Hello there!
+      </div>
+      <span class="text-black ml-2">👋</span>
+    </h1>
+    <p class="mt-4 text-4xl max-w-3xl">
+      I'm <span class="text-primary font-">Ash! A physicist who applies science everywhere (even when it doesn't fit).</span> 
+    </p>
+  </div>
+</section>
 
-<div class="flex flex-col items-center text-center min-h-screen px-6 py-12">
-  <header class="flex items-center justify-between w-full max-w-4xl pb-6">
-    <h1 class="text-2xl font-bold text-white">{name}</h1>
-    <button class="px-4 py-2 bg-blue-500 rounded-lg hover:bg-blue-400">{subscribers}</button>
-  </header>
-
-  <section class="max-w-4xl">
-    <img src="/avatar.png" alt="{name}" class="w-32 h-32 rounded-full border-4 border-blue-500 mb-4">
-    <h2 class="text-3xl font-semibold">Hey there! I'm {name} 👋</h2>
-    <p class="text-lg mt-3 text-gray-400">{title}</p>
-    <p class="mt-4 text-gray-300 leading-relaxed">{description}</p>
-  </section>
-
-  <section class="mt-8 bg-gray-800 p-6 rounded-xl w-full max-w-2xl">
-    <h3 class="text-xl font-bold text-white">Subscribe to LifeNotes</h3>
-    <p class="text-gray-400 mt-2">Get insights on productivity, deep tech, and strategy straight to your inbox.</p>
-    <div class="mt-4 flex flex-col sm:flex-row gap-3">
-      <input type="email" bind:value={$email} placeholder="Your email" class="flex-1 p-3 rounded-lg bg-gray-700 text-white">
-      <button class="px-4 py-3 bg-blue-600 rounded-lg hover:bg-blue-500">Subscribe</button>
-    </div>
-  </section>
-</div>
+<!-- Animated section with floating items -->
+<section class="py-20 px-4 text-center">
+  <h2 class="text-3xl font-semibold mb-6">Technologies I Use</h2>
+  <div class="align-middle flex flex-col items-center">
+    <img src="https://skillicons.dev/icons?i=py,tensorflow,pytorch,sklearn,fastapi,flask,anaconda" alt="Technology icons part 1" class="mb-4"/>
+    <img src="https://skillicons.dev/icons?i=js,ts,bun,html,css,tailwind,svelte,react,vite" alt="Technology icons part 2" class="mb-4"/>
+    <img src="https://skillicons.dev/icons?i=cs,cpp" alt="Technology icons part 3" class="mb-4"/>
+    <img src="https://skillicons.dev/icons?i=postgres,mysql,sqlite,redis,supabase" alt="Technology icons part 4" class="mb-4"/>
+    <img src="https://skillicons.dev/icons?i=figma,gcp,azure,bash,ubuntu,git,github,blender,unity,docker" alt="Technology icons part 5" class="mb-4"/>
+  </div>
+  <div class="my-4">
+    Icons added with <a href="https://skillicons.dev" target="_blank" rel="noopener noreferrer" class="text-blue-400">skillicons</a>
+  </div>
+  <div class="mt-8" >
+    <a
+      class="bg-primary px-6 py-3 text-black rounded-lg shadow hover:shadow-lg bg-cyan-300 
+      transform hover:scale-105 hover:bg-cyan-400 transition-all duration-300" href="/projects"
+    aria-label="View My Work">
+      View My Work
+    </a>
+  </div>
+</section>
