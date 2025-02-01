@@ -36,6 +36,8 @@
 	},
 	"dependencies": {
 		"@fontsource/montserrat": "^5.1.1",
+		"@threlte/core": "^8.0.1",
+		"@threlte/extras": "^9.0.1",
 		"postcss": "^8.5.1",
 		"svelte-preprocess": "^6.0.3"
 	}
