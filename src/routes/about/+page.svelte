@@ -59,6 +59,12 @@
 			</p>
 		</div>
 
+		<div class="mt-8 flex flex-col gap-3 sm:flex-row">
+			<a href="https://linktr.ee/ash_dot_py" target="_blank" rel="noopener noreferrer" class="btn-primary">
+				Find me on Linktree
+			</a>
+		</div>
+
 		<div class="mt-8 grid gap-3 sm:grid-cols-3">
 			<div class="rounded-2xl border border-white/10 bg-white/[0.04] p-4">
 				<p class="text-sm text-white/45">Mostly</p>

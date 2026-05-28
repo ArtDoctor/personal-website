@@ -13,6 +13,11 @@
 			artdoctorka@gmail.com
 		</a>
 		<p class="mt-4 leading-7 text-white/55">A few lines are enough. Tell me what you’re doing and what you’re looking for.</p>
-		<a href="mailto:artdoctorka@gmail.com" class="btn-primary mt-7">Send email</a>
+		<div class="mt-7 flex flex-col gap-3 sm:flex-row">
+			<a href="mailto:artdoctorka@gmail.com" class="btn-primary">Send email</a>
+			<a href="https://linktr.ee/ash_dot_py" target="_blank" rel="noopener noreferrer" class="btn-secondary">
+				Linktree
+			</a>
+		</div>
 	</div>
 </section>
