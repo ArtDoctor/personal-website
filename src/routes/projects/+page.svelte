@@ -1,6 +1,14 @@
 <script>
 	const projects = [
 		{
+			title: 'Yazero',
+			description:
+				'A home for the startups I’ve worked on with my co-founder — small bets, experiments, and products we’re trying to make real.',
+			link: 'https://www.yazero.io/',
+			image: '/images/validator-by-yazero.webp',
+			tags: ['Startups', 'Product', 'Co-founder']
+		},
+		{
 			title: 'Genetic Car Simulator',
 			description:
 				'A browser 3D playground where little cars slowly get better at driving over rough terrain through genes, mutation, crossover, and leaderboards.',
