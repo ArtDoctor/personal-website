@@ -1,73 +1,49 @@
 <script>
-    let menuOpen = false;
+	let menuOpen = false;
+
+	const links = [
+		{ href: '/about', label: 'About' },
+		{ href: '/projects', label: 'Projects' },
+		{ href: '/contact', label: 'Contact' }
+	];
 </script>
 
-<nav class="flex items-center justify-between py-4 px-10 relative z-10">
-  <a
-    href="/"
-    class="text-xl font-bold hover:text-cyan-400 transition-colors duration-300"
-  >
-    Artem
-  </a>
+<nav class="relative z-20 flex items-center justify-between py-2">
+	<a href="/" class="group inline-flex items-center gap-3" aria-label="Go home">
+		<span class="flex h-10 w-10 items-center justify-center rounded-2xl border border-white/10 bg-white/10 text-sm font-bold text-cyan-100 shadow-lg shadow-black/20 transition duration-300 group-hover:border-cyan-200/40 group-hover:bg-cyan-200/10">
+			AS
+		</span>
+		<span class="hidden text-sm font-semibold tracking-wide text-white/90 transition group-hover:text-white sm:block">
+			Artem Shelamanov
+		</span>
+	</a>
 
-  <!-- Desktop Menu -->
-  <div class="hidden md:flex space-x-6 text-center">
-    <a
-      href="/about"
-      class="hover:text-violet-400 duration-300 transition-all hover:font-bold hover:scale-110"
-      >About</a
-    >
-    <a
-      href="/projects"
-      class="hover:text-violet-400 duration-300 transition-all hover:font-bold hover:scale-110"
-      >Projects</a
-    >
-    <a
-      href="/contact"
-      class="hover:text-violet-400 duration-300 transition-all hover:font-bold hover:scale-110"
-      >Contact</a
-    >
-  </div>
+	<div class="hidden items-center gap-1 rounded-full border border-white/10 bg-white/[0.04] p-1 text-sm text-white/65 backdrop-blur md:flex">
+		{#each links as link}
+			<a href={link.href} class="rounded-full px-4 py-2 transition duration-300 hover:bg-white/10 hover:text-white">
+				{link.label}
+			</a>
+		{/each}
+	</div>
 
-  <!-- Mobile Menu Button -->
-  <button
-    class="md:hidden focus:outline-none"
-    on:click={() => (menuOpen = !menuOpen)}
-  >
-    <!-- Hamburger icon -->
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      class="h-6 w-6 fill-current"
-      viewBox="0 0 24 24"
-    >
-      <path
-        fill-rule="evenodd"
-        d="M4 5h16v2H4zM4 11h16v2H4zM4 17h16v2H4z"
-      />
-    </svg>
-  </button>
+	<button
+		class="inline-flex h-10 w-10 items-center justify-center rounded-2xl border border-white/10 bg-white/[0.04] text-white/80 transition hover:bg-white/10 md:hidden"
+		on:click={() => (menuOpen = !menuOpen)}
+		aria-expanded={menuOpen}
+		aria-label="Toggle navigation menu"
+	>
+		<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+			<path stroke-linecap="round" d="M4 7h16M4 12h16M4 17h16" />
+		</svg>
+	</button>
 
-  <!-- Mobile Menu Dropdown -->
-  {#if menuOpen}
-    <div
-      class="absolute top-14 right-0 bg-gray-900 p-4 rounded shadow-lg flex flex-col space-y-3 md:hidden animate-fadeIn"
-    >
-      <a
-        href="/about"
-        class="hover:text-primary transition-colors duration-300"
-        >About</a
-      >
-      <a
-        href="/projects"
-        class="hover:text-primary transition-colors duration-300"
-        >Projects</a
-      >
-      <a
-        href="/contact"
-        class="hover:text-primary transition-colors duration-300"
-        >Contact</a
-      >
-    </div>
-  {/if}
+	{#if menuOpen}
+		<div class="absolute right-0 top-14 flex w-52 flex-col gap-1 rounded-3xl border border-white/10 bg-neutral-950/95 p-2 shadow-2xl shadow-black/40 backdrop-blur md:hidden">
+			{#each links as link}
+				<a href={link.href} class="rounded-2xl px-4 py-3 text-sm text-white/75 transition hover:bg-white/10 hover:text-white">
+					{link.label}
+				</a>
+			{/each}
+		</div>
+	{/if}
 </nav>
-  

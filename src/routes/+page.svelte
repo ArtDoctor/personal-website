@@ -1,83 +1,105 @@
 <script>
-  let showHero = false;
-  let languages = [
-    { name: "🇬🇧 English", level: "C2", progress: 6, color: "green" },
-    { name: "🇺🇦 Ukrainian", level: "C2", progress: 6, color: "green" },
-    { name: "Russian", level: "C2", progress: 6, color: "green" },
-    { name: "🇩🇪 German", level: "B1", progress: 3, color: "yellow" },
-    { name: "🇨🇿 Czech", level: "A2", progress: 2, color: "yellow" },
-    { name: "🇨🇳 Chinese", level: "HSK2", progress: 2, color: "yellow" }
-  ];
+	import { onMount } from 'svelte';
 
-  // Trigger fadeIn on mount
-  import { onMount } from "svelte";
-  onMount(() => {
-    showHero = true;
-  });
+	let showHero = false;
+
+	const languages = [
+		{ name: '🇬🇧 English', level: 'C2', progress: 6 },
+		{ name: '🇺🇦 Ukrainian', level: 'C2', progress: 6 },
+		{ name: 'Russian', level: 'C2', progress: 6 },
+		{ name: '🇩🇪 German', level: 'B1', progress: 3 },
+		{ name: '🇨🇿 Czech', level: 'A2', progress: 2 },
+		{ name: '🇨🇳 Chinese', level: 'HSK2', progress: 2 }
+	];
+
+	const techRows = [
+		{ label: 'AI & data', src: 'https://skillicons.dev/icons?i=py,tensorflow,pytorch,sklearn,fastapi,flask,anaconda' },
+		{ label: 'Web', src: 'https://skillicons.dev/icons?i=js,ts,bun,html,css,tailwind,svelte,react,vite' },
+		{ label: 'Systems', src: 'https://skillicons.dev/icons?i=cs,cpp' },
+		{ label: 'Databases', src: 'https://skillicons.dev/icons?i=postgres,mysql,sqlite,redis,supabase' },
+		{ label: 'Tools', src: 'https://skillicons.dev/icons?i=figma,gcp,azure,bash,ubuntu,git,github,blender,unity,docker' }
+	];
+
+	onMount(() => {
+		showHero = true;
+	});
 </script>
 
 <section
-  class="flex flex-col md:flex-row items-center justify-center text-left py-20 transition-opacity duration-1000"
-  class:opacity-0={!showHero}
-  class:opacity-100={showHero}
+	class="grid min-h-[72vh] items-center gap-10 py-16 transition duration-1000 lg:grid-cols-[0.9fr_1.1fr] lg:py-24"
+	class:translate-y-4={!showHero}
+	class:opacity-0={!showHero}
+	class:opacity-100={showHero}
 >
-  <div class="md:w-1/2 flex justify-center mb-8 md:mb-0">
-    <img src="/images/avatar.png" alt="Hero" class="h-64 w-64 md:h-96 md:w-96" />
-  </div>
-  <div class="md:w-1/2">
-    <h1
-      class="text-5xl md:text-7xl  font-bold
-         animate-fadeIn flex items-center"
-    >
-      <div class="bg-gradient-to-r from-violet-600 via-cyan-500 to-violet-600 bg-clip-text text-transparent">
-        Hello there!
-      </div>
-      <span class="text-black ml-2">👋</span>
-    </h1>
-    <p class="mt-4 text-4xl max-w-3xl">
-      I'm <span class="text-primary font-">Ash! A physicist who applies science everywhere (even when it doesn't fit).</span> 
-    </p>
-  </div>
+	<div class="order-2 lg:order-1">
+		<div class="relative mx-auto max-w-sm">
+			<div class="absolute -inset-6 rounded-[2rem] bg-gradient-to-br from-cyan-400/20 via-violet-500/10 to-transparent blur-2xl"></div>
+			<div class="glass-card relative overflow-hidden p-5">
+				<img src="/images/avatar.png" alt="Portrait of Artem" class="aspect-square w-full rounded-[1.5rem] object-contain" />
+			</div>
+		</div>
+	</div>
+
+	<div class="order-1 text-center lg:order-2 lg:text-left">
+		<p class="eyebrow mb-5">Physics · data · building things</p>
+		<h1 class="gradient-text text-5xl font-bold tracking-tight sm:text-6xl lg:text-7xl">
+			Hi, I'm Artem — Ash to friends.
+		</h1>
+		<p class="mt-6 max-w-2xl text-xl leading-8 text-white/70 sm:text-2xl sm:leading-10">
+			I study physics, write code, and like making weird ideas actually work. Sometimes that means ML models, sometimes simulations, sometimes just a lot of debugging.
+		</p>
+		<div class="mt-8 flex flex-col justify-center gap-3 sm:flex-row lg:justify-start">
+			<a class="btn-primary" href="/projects">See projects</a>
+			<a class="btn-secondary" href="/about">About me</a>
+		</div>
+	</div>
 </section>
 
-<!-- Animated section with floating items -->
-<section class="py-20 px-4 text-center">
-  <h2 class="text-3xl font-semibold mb-6">Technologies I Use</h2>
-  <div class="align-middle flex flex-col items-center">
-    <img src="https://skillicons.dev/icons?i=py,tensorflow,pytorch,sklearn,fastapi,flask,anaconda" alt="Technology icons part 1" class="mb-4"/>
-    <img src="https://skillicons.dev/icons?i=js,ts,bun,html,css,tailwind,svelte,react,vite" alt="Technology icons part 2" class="mb-4"/>
-    <img src="https://skillicons.dev/icons?i=cs,cpp" alt="Technology icons part 3" class="mb-4"/>
-    <img src="https://skillicons.dev/icons?i=postgres,mysql,sqlite,redis,supabase" alt="Technology icons part 4" class="mb-4"/>
-    <img src="https://skillicons.dev/icons?i=figma,gcp,azure,bash,ubuntu,git,github,blender,unity,docker" alt="Technology icons part 5" class="mb-4"/>
-  </div>
-  <div class="my-4">
-    Icons added with <a href="https://skillicons.dev" target="_blank" rel="noopener noreferrer" class="text-blue-400">skillicons</a>
-  </div>
-  <div class="mt-8" >
-    <a
-      class="bg-primary px-6 py-3 text-black rounded-lg shadow hover:shadow-lg bg-cyan-300 
-      transform hover:scale-105 hover:bg-cyan-400 transition-all duration-300" href="/projects"
-    aria-label="View My Work">
-      View My Work
-    </a>
-  </div>
+<section class="py-12 sm:py-16">
+	<div class="mb-8 flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
+		<div>
+			<p class="eyebrow mb-3">Stack</p>
+			<h2 class="text-3xl font-bold tracking-tight text-white sm:text-4xl">Tools I reach for</h2>
+		</div>
+		<a href="https://skillicons.dev" target="_blank" rel="noopener noreferrer" class="text-sm text-white/45 transition hover:text-cyan-200">
+			Icons by skillicons
+		</a>
+	</div>
+
+	<div class="grid gap-4">
+		{#each techRows as row}
+			<div class="glass-card glass-card-hover flex flex-col gap-4 p-5 sm:flex-row sm:items-center sm:justify-between">
+				<span class="text-sm font-semibold uppercase tracking-[0.2em] text-white/45">{row.label}</span>
+				<img src={row.src} alt={`${row.label} technology icons`} class="max-w-full self-start sm:self-center" loading="lazy" />
+			</div>
+		{/each}
+	</div>
 </section>
 
-<!-- Section with languages -->
-<section class="py-20 px-4 text-center">
-  <h2 class="text-3xl font-semibold mb-8">Languages</h2>
-  <div class="flex flex-col items-center space-y-6">
-    {#each languages as lang}
-      <div class="flex items-center space-x-4 w-full max-w-lg">
-        <span class="text-lg font-medium w-28 text-left">{lang.name}</span>
-        <div class="flex space-x-1 flex-1">
-          {#each Array(6).fill(0).map((_, i) => i) as i}
-            <div class="w-12 h-6 rounded-md shadow-md transition-all duration-300 {i < lang.progress ? `bg-${lang.color}-500` : `bg-${lang.color}-300 shadow-inner`}">
-            </div>
-          {/each}
-        </div>
-        <span class="text-lg font-medium w-8 text-right">{lang.level}</span>
-      </div>
-    {/each}
-  </div>
+<section class="py-12 sm:py-16">
+	<div class="glass-card p-6 sm:p-8 lg:p-10">
+		<div class="mb-8 flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
+			<div>
+				<p class="eyebrow mb-3">Languages</p>
+				<h2 class="text-3xl font-bold tracking-tight text-white sm:text-4xl">Languages I speak</h2>
+			</div>
+			<p class="max-w-md text-sm leading-6 text-white/50">Useful for reading papers, moving countries, and occasionally ordering coffee correctly.</p>
+		</div>
+
+		<div class="grid gap-4 md:grid-cols-2">
+			{#each languages as lang}
+				<div class="rounded-2xl border border-white/10 bg-black/20 p-4">
+					<div class="mb-3 flex items-center justify-between gap-4">
+						<span class="font-semibold text-white/85">{lang.name}</span>
+						<span class="rounded-full border border-cyan-200/20 bg-cyan-200/10 px-3 py-1 text-xs font-semibold text-cyan-100">{lang.level}</span>
+					</div>
+					<div class="flex gap-1.5" aria-label={`${lang.name} proficiency ${lang.level}`}>
+						{#each Array(6).fill(0) as _, i}
+							<div class={`h-2.5 flex-1 rounded-full ${i < lang.progress ? 'bg-gradient-to-r from-cyan-300 to-violet-300' : 'bg-white/10'}`}></div>
+						{/each}
+					</div>
+				</div>
+			{/each}
+		</div>
+	</div>
 </section>

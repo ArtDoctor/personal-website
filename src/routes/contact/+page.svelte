@@ -1,63 +1,18 @@
-<script>
-    import { onMount } from "svelte";
-  
-    let name = "";
-    let email = "";
-    let message = "";
-    let submitted = false;
-  
-    function handleSubmit() {
-      // This can be expanded to use a real form endpoint, e.g. using fetch()
-      submitted = true;
-    }
-  </script>
-  
-  <section class="py-20 px-4 max-w-xl mx-auto">
-    <h1 class="text-5xl font-bold mb-6 text-center">Contact Me</h1>
-    <div class="text-3xl text-center">
-      This is WIP, just write to my email: <a href="mailto:artdoctorka@gmail.com" class="text-blue-300">artdoctorka@gmail.com</a>
-    </div>
-    <!-- {#if submitted}
-      <p class="text-center text-xl text-primary">Thanks for your message!</p>
-    {:else}
-      <form on:submit|preventDefault={handleSubmit} class="space-y-4">
-        <div>
-          <label for="name" class="block text-sm mb-1">Name</label>
-          <input
-            id="name"
-            class="w-full p-2 rounded bg-gray-800 border border-gray-700 focus:outline-none focus:ring-2 focus:ring-primary"
-            bind:value={name}
-            required
-          />
-        </div>
-        <div>
-          <label for="email" class="block text-sm mb-1">Email</label>
-          <input
-            id="email"
-            type="email"
-            class="w-full p-2 rounded bg-gray-800 border border-gray-700 focus:outline-none focus:ring-2 focus:ring-primary"
-            bind:value={email}
-            required
-          />
-        </div>
-        <div>
-          <label for="message" class="block text-sm mb-1">Message</label>
-          <textarea
-            id="message"
-            rows="4"
-            class="w-full p-2 rounded bg-gray-800 border border-gray-700 focus:outline-none focus:ring-2 focus:ring-primary"
-            bind:value={message}
-            required
-          />
-        </div>
-        <button
-          type="submit"
-          class="px-4 py-2 bg-primary text-white rounded hover:bg-pink-600
-            transition-colors duration-300"
-        >
-          Send
-        </button>
-      </form>
-    {/if} -->
-  </section>
-  
+<section class="grid items-center gap-8 py-16 lg:grid-cols-[1fr_0.8fr] lg:py-24">
+	<div>
+		<p class="eyebrow mb-4">Contact</p>
+		<h1 class="gradient-text text-5xl font-bold tracking-tight sm:text-6xl">Want to chat?</h1>
+		<p class="mt-6 max-w-2xl text-lg leading-8 text-white/65">
+			If you’re working on something interesting — research, AI, physics software, a prototype, or a slightly chaotic idea — feel free to reach out.
+		</p>
+	</div>
+
+	<div class="glass-card p-6 sm:p-8">
+		<p class="text-sm font-semibold uppercase tracking-[0.22em] text-white/40">Email</p>
+		<a href="mailto:artdoctorka@gmail.com" class="mt-5 block break-all text-2xl font-bold text-white transition hover:text-cyan-100 sm:text-3xl">
+			artdoctorka@gmail.com
+		</a>
+		<p class="mt-4 leading-7 text-white/55">A few lines are enough. Tell me what you’re doing and what you’re looking for.</p>
+		<a href="mailto:artdoctorka@gmail.com" class="btn-primary mt-7">Send email</a>
+	</div>
+</section>
