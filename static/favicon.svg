@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="title desc">
+  <title id="title">Aurora prism icon</title>
+  <desc id="desc">A green-cyan prism core with two clean satellite dots.</desc>
+  <defs>
+    <linearGradient id="bg" x1="54" y1="44" x2="458" y2="468" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#031912"/><stop offset="1" stop-color="#05070d"/>
+    </linearGradient>
+    <linearGradient id="mark" x1="126" y1="112" x2="388" y2="406" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#86efac"/><stop offset="0.48" stop-color="#2dd4bf"/><stop offset="1" stop-color="#38bdf8"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="118" fill="url(#bg)"/>
+  <ellipse cx="256" cy="256" rx="178" ry="70" transform="rotate(32 256 256)" fill="none" stroke="#86efac" stroke-opacity="0.48" stroke-width="26" stroke-linecap="round"/>
+  <path d="M256 101 392 180v154L256 411 120 334V180l136-79Z" fill="url(#mark)"/>
+  <path d="M256 184 317 219v74l-61 35-61-35v-74l61-35Z" fill="#05070d"/>
+  <circle cx="123" cy="333" r="24" fill="#38bdf8"/>
+  <circle cx="390" cy="180" r="20" fill="#f8fafc"/>
+</svg>
