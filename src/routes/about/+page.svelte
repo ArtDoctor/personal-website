@@ -4,7 +4,7 @@
 	import { AsciiRenderer } from '@threlte/extras';
 	import { Canvas } from '@threlte/core';
 
-	let fgColor = $state('#818CF8');
+	let fgColor = $state('#0D9488');
 	let bgColor = $state('#0B0D14');
 
 	const defaultCharacters = ' .:-+*=%@#';

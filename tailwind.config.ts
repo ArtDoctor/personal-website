@@ -13,10 +13,10 @@ export default {
 					overlay: '#1A1D28',
 				},
 				accent: {
-					DEFAULT: '#818CF8',
-					light: '#A5B4FC',
-					dark: '#6366F1',
-					muted: 'rgba(129, 140, 248, 0.12)',
+					DEFAULT: '#0D9488',
+					light: '#2DD4BF',
+					dark: '#0F766E',
+					muted: 'rgba(13, 148, 136, 0.12)',
 				},
 				muted: {
 					DEFAULT: '#6B7280',
@@ -24,7 +24,7 @@ export default {
 				},
 				border: {
 					DEFAULT: 'rgba(255, 255, 255, 0.08)',
-					hover: 'rgba(129, 140, 248, 0.3)',
+					hover: 'rgba(13, 148, 136, 0.3)',
 				},
 			},
 			fontFamily: {

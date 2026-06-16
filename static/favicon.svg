@@ -1,18 +1,18 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="title desc">
-  <title id="title">AS monogram icon</title>
-  <desc id="desc">An indigo monogram for Artem Shelamanov on dark background.</desc>
+  <title id="title">A monogram icon</title>
+  <desc id="desc">A teal monogram for Artem Shelamanov on dark background.</desc>
   <defs>
     <linearGradient id="bg" x1="54" y1="44" x2="458" y2="468" gradientUnits="userSpaceOnUse">
       <stop stop-color="#0B0D14"/><stop offset="1" stop-color="#12141D"/>
     </linearGradient>
     <linearGradient id="mark" x1="126" y1="112" x2="388" y2="406" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#818CF8"/><stop offset="1" stop-color="#6366F1"/>
+      <stop stop-color="#0D9488"/><stop offset="1" stop-color="#0F766E"/>
     </linearGradient>
   </defs>
   <rect width="512" height="512" rx="96" fill="url(#bg)"/>
   <rect x="0" y="0" width="512" height="3" fill="url(#mark)" rx="0"/>
   <path d="M256 101 392 180v154L256 411 120 334V180l136-79Z" fill="url(#mark)" opacity="0.08"/>
-  <text x="256" y="310" text-anchor="middle" font-family="system-ui, sans-serif" font-weight="700" font-size="220" fill="#E5E7EB">AS</text>
-  <circle cx="123" cy="333" r="16" fill="#818CF8"/>
-  <circle cx="390" cy="180" r="12" fill="#A5B4FC"/>
+  <text x="256" y="326" text-anchor="middle" font-family="system-ui, sans-serif" font-weight="700" font-size="270" fill="#E5E7EB">A</text>
+  <circle cx="123" cy="333" r="16" fill="#0D9488"/>
+  <circle cx="390" cy="180" r="12" fill="#2DD4BF"/>
 </svg>

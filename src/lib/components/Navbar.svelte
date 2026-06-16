@@ -10,11 +10,9 @@
 
 <nav class="relative z-20 flex items-center justify-between py-6">
 	<a href="/" class="group inline-flex items-center gap-3" aria-label="Go home">
-		<span class="flex h-9 w-9 items-center justify-center rounded-lg border border-border bg-surface-overlay text-sm font-semibold text-accent transition duration-300 group-hover:border-border-hover group-hover:bg-accent-muted">
-			AS
-		</span>
+		<img src="/favicon.svg" alt="" class="h-9 w-9 rounded-lg transition duration-300 group-hover:scale-105" />
 		<span class="hidden text-sm font-medium text-gray-400 transition group-hover:text-white sm:block">
-			Artem Shelamanov
+			Shelamanov
 		</span>
 	</a>
 
