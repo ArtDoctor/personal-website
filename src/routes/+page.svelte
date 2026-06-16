@@ -35,7 +35,7 @@
 		<div class="relative mx-auto max-w-sm">
 			<div class="absolute -inset-6 rounded-[2rem] bg-gradient-to-br from-cyan-400/20 via-violet-500/10 to-transparent blur-2xl"></div>
 			<div class="glass-card relative overflow-hidden p-5">
-				<img src="/images/avatar.png" alt="Portrait of Artem" class="aspect-square w-full rounded-[1.5rem] object-contain" />
+				<img src="/images/mai.png" alt="Portrait of Artem" class="w-full rounded-[1.5rem] object-contain" />
 			</div>
 		</div>
 	</div>
@@ -43,8 +43,11 @@
 	<div class="order-1 text-center lg:order-2 lg:text-left">
 		<p class="eyebrow mb-5">Physics · data · building things</p>
 		<h1 class="gradient-text text-5xl font-bold tracking-tight sm:text-6xl lg:text-7xl">
-			Hi, I'm Artem — Ash to friends.
+			Hi, I'm Artem<a href="#artemis-note" class="align-super text-3xl sm:text-4xl lg:text-5xl">*</a>
 		</h1>
+		<p id="artemis-note" class="mt-3 text-sm text-white/50">
+			* yes, like <a href="https://www.nasa.gov/humans-in-space/artemis/" target="_blank" rel="noopener noreferrer" class="text-cyan-200 underline decoration-cyan-200/40 underline-offset-4 transition hover:text-cyan-100">Artemis</a>, the NASA mission
+		</p>
 		<p class="mt-6 max-w-2xl text-xl leading-8 text-white/70 sm:text-2xl sm:leading-10">
 			I study physics, write code, and like making weird ideas actually work. Sometimes that means ML models, sometimes simulations, sometimes just a lot of debugging.
 		</p>

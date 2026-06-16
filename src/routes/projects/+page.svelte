@@ -19,7 +19,7 @@
 		{
 			title: 'Thomson Parabolas',
 			description:
-				'A tool for handling Thomson spectrometer images: cleaning detector shots, finding ion parabolas, classifying species, and turning the result into energy spectra.',
+				'My bachelor thesis - a tool for handling Thomson spectrometer images: cleaning detector shots, finding ion parabolas, classifying species, and turning the result into energy spectra.',
 			link: 'https://thomson-parabolas-unet.shelamanov.com/',
 			image: '/images/thomson-parabolas-unet.png',
 			tags: ['U-Net', 'Physics', 'Computer vision']

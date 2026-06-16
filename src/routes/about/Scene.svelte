@@ -11,7 +11,7 @@
   
   <T.PerspectiveCamera
     makeDefault
-    position.z={2.8}
+    position.z={3.6}
     rotation.y={Math.PI / 2}
   >
     <OrbitControls {autoRotate} />
