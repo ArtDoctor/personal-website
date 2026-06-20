@@ -1,7 +1,7 @@
-<script>
+<script lang="ts">
 	import { onMount } from 'svelte';
 
-	let showHero = false;
+	let showHero = $state(false);
 
 	const languages = [
 		{ name: '🇬🇧 English', level: 'C2', progress: 6 },
@@ -13,11 +13,23 @@
 	];
 
 	const techRows = [
-		{ label: 'AI & data', src: 'https://skillicons.dev/icons?i=py,tensorflow,pytorch,sklearn,fastapi,flask,anaconda' },
-		{ label: 'Web', src: 'https://skillicons.dev/icons?i=js,ts,bun,html,css,tailwind,svelte,react,vite' },
+		{
+			label: 'AI & data',
+			src: 'https://skillicons.dev/icons?i=py,tensorflow,pytorch,sklearn,fastapi,flask,anaconda'
+		},
+		{
+			label: 'Web',
+			src: 'https://skillicons.dev/icons?i=js,ts,bun,html,css,tailwind,svelte,react,vite'
+		},
 		{ label: 'Systems', src: 'https://skillicons.dev/icons?i=cs,cpp' },
-		{ label: 'Databases', src: 'https://skillicons.dev/icons?i=postgres,mysql,sqlite,redis,supabase' },
-		{ label: 'Tools', src: 'https://skillicons.dev/icons?i=figma,gcp,azure,bash,ubuntu,git,github,blender,unity,docker' }
+		{
+			label: 'Databases',
+			src: 'https://skillicons.dev/icons?i=postgres,mysql,sqlite,redis,supabase'
+		},
+		{
+			label: 'Tools',
+			src: 'https://skillicons.dev/icons?i=figma,gcp,azure,bash,ubuntu,git,github,blender,unity,docker'
+		}
 	];
 
 	onMount(() => {
@@ -45,13 +57,23 @@
 	<div class="order-1 text-center lg:order-2 lg:text-left">
 		<p class="eyebrow mb-4">Physics · data · building things</p>
 		<h1 class="heading text-5xl sm:text-6xl lg:text-7xl">
-			Hi, I'm Artem<a href="#artemis-note" class="align-super text-3xl text-accent sm:text-4xl lg:text-5xl">*</a>
+			Hi, I'm Artem<a
+				href="#artemis-note"
+				class="align-super text-3xl text-accent sm:text-4xl lg:text-5xl">*</a
+			>
 		</h1>
 		<p id="artemis-note" class="mt-3 text-sm text-gray-600">
-			* yes, like <a href="https://www.nasa.gov/humans-in-space/artemis/" target="_blank" rel="noopener noreferrer" class="text-accent-light underline decoration-accent/30 underline-offset-4 transition hover:text-accent">Artemis</a>, the NASA mission
+			* yes, like <a
+				href="https://www.nasa.gov/humans-in-space/artemis/"
+				target="_blank"
+				rel="noopener noreferrer"
+				class="text-accent-light underline decoration-accent/30 underline-offset-4 transition hover:text-accent"
+				>Artemis</a
+			>, the NASA mission
 		</p>
 		<p class="mt-6 max-w-2xl text-lg leading-8 text-gray-400 sm:text-xl sm:leading-9">
-			I study physics, write code, and like making weird ideas actually work. Sometimes that means ML models, sometimes simulations, sometimes just a lot of debugging.
+			I study physics, write code, and like making weird ideas actually work. Sometimes that means
+			ML models, sometimes simulations, sometimes just a lot of debugging.
 		</p>
 		<div class="mt-8 flex flex-col justify-center gap-3 sm:flex-row lg:justify-start">
 			<a class="btn-primary" href="/projects">See projects</a>
@@ -69,16 +91,29 @@
 			<p class="eyebrow mb-3">Stack</p>
 			<h2 class="heading text-3xl sm:text-4xl">Tools I reach for</h2>
 		</div>
-		<a href="https://skillicons.dev" target="_blank" rel="noopener noreferrer" class="text-sm text-gray-600 transition hover:text-accent">
+		<a
+			href="https://skillicons.dev"
+			target="_blank"
+			rel="noopener noreferrer"
+			class="text-sm text-gray-600 transition hover:text-accent"
+		>
 			Icons by skillicons
 		</a>
 	</div>
 
 	<div class="grid gap-3">
 		{#each techRows as row}
-			<div class="card card-hover flex flex-col gap-4 p-5 sm:flex-row sm:items-center sm:justify-between">
-				<span class="text-xs font-medium uppercase tracking-[0.2em] text-gray-600">{row.label}</span>
-				<img src={row.src} alt={`${row.label} technology icons`} class="max-w-full self-start sm:self-center" loading="lazy" />
+			<div
+				class="card card-hover flex flex-col gap-4 p-5 sm:flex-row sm:items-center sm:justify-between"
+			>
+				<span class="text-xs font-medium uppercase tracking-[0.2em] text-gray-600">{row.label}</span
+				>
+				<img
+					src={row.src}
+					alt={`${row.label} technology icons`}
+					class="max-w-full self-start sm:self-center"
+					loading="lazy"
+				/>
 			</div>
 		{/each}
 	</div>
@@ -94,7 +129,9 @@
 				<p class="eyebrow mb-3">Languages</p>
 				<h2 class="heading text-3xl sm:text-4xl">Languages I speak</h2>
 			</div>
-			<p class="max-w-md text-sm leading-6 text-gray-600">Useful for reading papers, moving countries, and occasionally ordering coffee correctly.</p>
+			<p class="max-w-md text-sm leading-6 text-gray-600">
+				Useful for reading papers, moving countries, and occasionally ordering coffee correctly.
+			</p>
 		</div>
 
 		<div class="grid gap-3 md:grid-cols-2">
@@ -106,7 +143,9 @@
 					</div>
 					<div class="flex gap-1.5" aria-label={`${lang.name} proficiency ${lang.level}`}>
 						{#each Array(6).fill(0) as _, i}
-							<div class={`h-2 flex-1 rounded-full ${i < lang.progress ? 'bg-gradient-to-r from-accent to-accent-light' : 'bg-white/5'}`}></div>
+							<div
+								class={`h-2 flex-1 rounded-full ${i < lang.progress ? 'bg-gradient-to-r from-accent to-accent-light' : 'bg-white/5'}`}
+							></div>
 						{/each}
 					</div>
 				</div>
