@@ -91,7 +91,7 @@
 			<p class="eyebrow">Hobbies</p>
 			<div class="mt-4 flex flex-wrap gap-2">
 				<span class="tag">Drones · FPV & building</span>
-				<span class="tag">Bouldering</span>
+				<span class="tag">Climbing</span>
 				<span class="tag-muted">Hiking</span>
 				<span class="tag-muted">Cycling</span>
 				<span class="tag-muted">Sci-fi & speculative fiction</span>
