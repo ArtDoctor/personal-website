@@ -51,8 +51,8 @@
 				</figure>
 
 				<figure class="mb-4 break-inside-avoid overflow-hidden rounded-lg border border-border bg-surface p-2">
-					<img src="/images/bouldering.png" alt="Bouldering" class="w-full rounded object-contain" loading="lazy" />
-					<figcaption class="px-2 pb-1 pt-3 text-xs font-medium uppercase tracking-[0.16em] text-accent">Bouldering</figcaption>
+					<img src="/images/bouldering.png" alt="Climbing" class="w-full rounded object-contain" loading="lazy" />
+					<figcaption class="px-2 pb-1 pt-3 text-xs font-medium uppercase tracking-[0.16em] text-accent">Climbing</figcaption>
 				</figure>
 
 				<figure class="mb-4 break-inside-avoid overflow-hidden rounded-lg border border-border bg-surface p-2">
