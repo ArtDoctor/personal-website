@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { reveal } from '$lib/actions/reveal';
 	import { kolo, person } from '$lib/content';
+	import KoloVisual from '$lib/visuals/KoloVisual.svelte';
 
 	const largest = Math.max(...kolo.clusters.map((cluster) => cluster.tracks));
 
@@ -36,20 +37,12 @@
 
 <section class="band">
 	<figure class="rise" use:reveal>
-		<div class="plate wide-plate">
-			<video
-				use:loop
-				src="/images/projects/kolo-taste.mp4"
-				poster="/images/projects/kolo-taste.webp"
-				muted
-				loop
-				playsinline
-				preload="metadata"
-				aria-label="Flying through a 3D map of a music library, each dot a track"
-			></video>
+		<div class="plate space-plate">
+			<KoloVisual interactive />
 		</div>
 		<figcaption class="mono">
-			fig. 1 · the taste universe. every dot is a track from my library, placed by how it sounds.
+			fig. 1 · the taste universe, live. every dot is a track from my library, placed by how it
+			sounds. move across it to turn it.
 		</figcaption>
 	</figure>
 </section>
@@ -190,8 +183,14 @@
 </section>
 
 <style>
-	.wide-plate {
-		aspect-ratio: 800 / 372;
+	.space-plate {
+		aspect-ratio: 2 / 1;
+	}
+
+	@media (max-width: 860px) {
+		.space-plate {
+			aspect-ratio: 4 / 3;
+		}
 	}
 
 	.gallery .wide-plate {

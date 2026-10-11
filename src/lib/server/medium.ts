@@ -33,7 +33,7 @@ const fallbackArticles: MediumArticle[] = [
 		tags: ['machine-learning', 'llm', 'ai']
 	},
 	{
-		title: 'I Switched From Windows To Linux For 1 Month — Here Is What Happened',
+		title: 'I Switched From Windows To Linux For 1 Month - Here Is What Happened',
 		link: 'https://pub.towardsai.net/i-switched-from-windows-to-linux-for-1-month-here-is-what-happened-8c920be92d27',
 		date: 'Jan 27, 2025',
 		datetime: '2025-01-27T20:02:05.000Z',
@@ -47,6 +47,7 @@ const fallbackArticles: MediumArticle[] = [
 // The home page and the Medium page both show the feed. Medium answers 429 when it is asked
 // too often, so the last good answer is kept and reused for an hour.
 const FEED_TTL = 60 * 60 * 1000;
+const FEED_TIMEOUT = 3000;
 let cached: { at: number; articles: MediumArticle[] } | null = null;
 
 /**
@@ -56,8 +57,12 @@ let cached: { at: number; articles: MediumArticle[] } | null = null;
 export async function loadMediumArticles(fetch: typeof globalThis.fetch): Promise<MediumArticle[]> {
 	if (cached && Date.now() - cached.at < FEED_TTL) return cached.articles;
 
+	// Bound both the connection and body download, without changing the saved-feed fallback.
+	const controller = new AbortController();
+	const timeout = setTimeout(() => controller.abort(), FEED_TIMEOUT);
+
 	try {
-		const response = await fetch(MEDIUM_FEED_URL);
+		const response = await fetch(MEDIUM_FEED_URL, { signal: controller.signal });
 
 		if (!response.ok) {
 			throw new Error(`Medium feed responded with ${response.status}`);
@@ -70,12 +75,14 @@ export async function loadMediumArticles(fetch: typeof globalThis.fetch): Promis
 		return articles.length ? articles : (cached?.articles ?? fallbackArticles);
 	} catch {
 		return cached?.articles ?? fallbackArticles;
+	} finally {
+		clearTimeout(timeout);
 	}
 }
 
 function parseMediumFeed(feed: string): MediumArticle[] {
 	return [...feed.matchAll(/<item>([\s\S]*?)<\/item>/g)].map(([, item]) => {
-		const title = getTag(item, 'title');
+		const title = plainDashes(getTag(item, 'title'));
 		const link = removeTrackingParams(getTag(item, 'link'));
 		const published = getTag(item, 'pubDate');
 		const content = getTag(item, 'description') || getTag(item, 'content:encoded');
@@ -95,11 +102,16 @@ function parseMediumFeed(feed: string): MediumArticle[] {
 						year: 'numeric'
 					}).format(date),
 			datetime: Number.isNaN(date.getTime()) ? '' : date.toISOString(),
-			excerpt: getExcerpt(content),
+			excerpt: plainDashes(getExcerpt(content)),
 			image: getImage(content),
 			tags: categories
 		};
 	});
+}
+
+/** The site uses plain hyphens, so long dashes in Medium's titles and excerpts are swapped. */
+function plainDashes(text: string): string {
+	return text.replace(/\s*[\u2013\u2014]\s*/g, ' - ');
 }
 
 function getTag(item: string, tagName: string): string {

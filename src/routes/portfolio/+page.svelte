@@ -8,7 +8,7 @@
 	<title>Portfolio · {person.name}</title>
 	<meta
 		name="description"
-		content="Mostly physics, simulation, and machine-learning experiments — the kind of projects where I learn by making the thing work."
+		content="Mostly physics, simulation, and machine-learning experiments - the kind of projects where I learn by making the thing work."
 	/>
 </svelte:head>
 
@@ -16,7 +16,7 @@
 	<p class="crumb mono"><a href="/">home</a><b>/</b><span>portfolio</span></p>
 	<h1>Some things I've built.</h1>
 	<p class="intro">
-		Mostly physics, simulation, and machine-learning experiments — the kind of projects where I
+		Mostly physics, simulation, and machine-learning experiments - the kind of projects where I
 		learn by making the thing work.
 	</p>
 </section>

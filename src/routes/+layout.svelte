@@ -2,6 +2,7 @@
 	import { onMount } from 'svelte';
 	import { page } from '$app/state';
 	import { person } from '$lib/content';
+	import { eclipse } from '$lib/site/eclipse.svelte';
 	import Orbits from '$lib/site/Orbits.svelte';
 	import '../app.css';
 	import '$lib/site/site.css';
@@ -20,6 +21,12 @@
 
 	const isHome = $derived(page.url.pathname === '/');
 
+	// On the home page the bar floats over the hero until the disc has passed under it.
+	const solid = $derived(isHome ? eclipse.overhead || eclipse.progress > 0.9 : scrolled > 24);
+	const readout = $derived(
+		eclipse.coverage > 0.995 ? 'totality' : `obscuration ${Math.round(eclipse.coverage * 100)}%`
+	);
+
 	// The orbits are at full strength behind the top of each page and step back as you read on.
 	const fieldOpacity = $derived(Math.max(0.5, 1 - scrolled / 1400));
 
@@ -34,11 +41,14 @@
 <div class="site" class:ready style:--field-opacity={fieldOpacity}>
 	<Orbits />
 
-	<header class="bar" class:solid={scrolled > (isHome ? 560 : 24)}>
+	<header class="bar" class:solid class:float={isHome && !solid}>
 		<a href="/" class="brand" aria-label="Home">
 			<span class="long">{person.name}</span>
 			<span class="short">A<i>*</i></span>
 		</a>
+		{#if isHome}
+			<span class="readout" class:on={eclipse.active} aria-hidden="true">{readout}</span>
+		{/if}
 		<nav aria-label="Pages">
 			{#each links as link}
 				<a

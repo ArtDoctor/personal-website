@@ -215,6 +215,7 @@
 	}
 
 	.moves .delta {
+		font-family: var(--display);
 		font-size: 1.35rem;
 		font-stretch: 112%;
 		font-weight: var(--title-weight);

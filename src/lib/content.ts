@@ -4,9 +4,9 @@ export const person = {
 	email: 'artdoctorka@gmail.com',
 	city: 'Prague',
 	from: 'Dnipro, Ukraine',
-	tagline: 'Physics · data · building things',
+	tagline: 'Applied ML/R&D engineer · computational physics · Prague',
 	intro:
-		'I study physics, write code, and like making weird ideas actually work. Sometimes that means ML models, sometimes simulations, sometimes just a lot of debugging.',
+		'I studied computational physics, build ML systems for a living, and like making weird ideas actually work. Some of them now inspect parts in factories, spot rust on wind turbines, and read ion traces at a laser facility. The rest was mostly debugging.',
 	artemisUrl: 'https://www.nasa.gov/humans-in-space/artemis/'
 };
 
@@ -22,13 +22,25 @@ export const about = [
 	"I'm Artem. I'm into computational physics, data science, startups, and the kind of problems that look simple until you actually try to solve them.",
 	'Most of what I enjoy sits somewhere between research and making things people can use: simulations, ML, small tools, rough prototypes, cleaner interfaces.',
 	'Outside formal work, I like experimenting with small systems: FPV drones, physics simulations, ML models, soldering, and weird side projects that turn abstract rules into something visible or usable.',
-	"I'm happiest when I'm exploring systems with hidden rules — whether that's a model, a drone build, a trail, or a good sci-fi world."
+	"I'm happiest when I'm exploring systems with hidden rules - whether that's a model, a drone build, a trail, or a good sci-fi world."
 ];
 
-export const traits = [
-	{ label: 'Mostly', value: 'AI & physics' },
-	{ label: 'Working style', value: 'Curious, practical' },
-	{ label: 'Default mood', value: "Let's try it" }
+/** The short version of where I work and what I studied. Not a CV. */
+export const facts = [
+	{
+		label: 'Day job',
+		value: 'Applied ML/R&D engineer at NeuroForge since 2022: vision, speech, documents, retrieval.'
+	},
+	{
+		label: 'Studied',
+		value:
+			'Computational physics at the Czech Technical University in Prague, with a research job in its laser physics department on the side.'
+	},
+	{
+		label: 'Published',
+		value:
+			'Co-author of a laser-plasma physics paper built on data from the PALS laser facility. Under peer review at Plasma Physics and Controlled Fusion.'
+	}
 ];
 
 export type Project = {
@@ -43,7 +55,7 @@ export type Project = {
 	page?: string;
 };
 
-/** The bigger things: each has a screenshot. */
+/** The bigger things. Each has a picture: a live one from src/lib/visuals where there is one for its slug, or else `image`. */
 export const projects: Project[] = [
 	{
 		slug: 'thomson',
@@ -91,7 +103,7 @@ export const projects: Project[] = [
 		slug: 'yazero',
 		title: 'Yazero',
 		description:
-			"A home for the startups I've worked on with my co-founder — small bets, experiments, and products we're trying to make real.",
+			"A home for the startups I've worked on with my co-founder - small bets, experiments, and products we're trying to make real.",
 		stack: 'Startups · LLM products · retrieval',
 		link: 'https://www.yazero.io/',
 		linkLabel: 'yazero.io',
@@ -205,8 +217,16 @@ export type Result = {
 	note: string;
 };
 
-/** A few things that worked, with the number that says so. */
+/** A few things that worked, with the number that says so. The first row is the overview. */
 export const results: Result[] = [
+	{
+		prefix: '',
+		value: 20,
+		decimals: 0,
+		suffix: '+',
+		label: 'projects shipped',
+		note: 'Four years of applied ML and R&D at NeuroForge, from the first dataset to the deployed thing. A few of them, and a few of my own, below.'
+	},
 	{
 		prefix: '',
 		value: 99.6,
@@ -214,22 +234,6 @@ export const results: Result[] = [
 		suffix: '%',
 		label: 'test accuracy',
 		note: 'A computer-vision system that finds defects in manufactured parts. It inspects parts at factories in several countries.'
-	},
-	{
-		prefix: '~',
-		value: 90,
-		decimals: 0,
-		suffix: '%',
-		label: 'less manual review',
-		note: 'A pipeline that spots rust and scratches on wind turbines in drone video, then places them on a 3D model.'
-	},
-	{
-		prefix: '<',
-		value: 1,
-		decimals: 0,
-		suffix: ' min',
-		label: 'per image, down from hours',
-		note: 'My thesis pipeline for Thomson spectrometer data, used on shots from the PALS laser facility.'
 	},
 	{
 		prefix: '$',
@@ -250,8 +254,11 @@ export const results: Result[] = [
 ];
 
 export const alsoTrue = [
-	'Co-author of a laser-plasma paper, under peer review at Plasma Physics and Controlled Fusion.',
+	'Built a pipeline that spots rust and scratches on wind turbines in drone video and places them on a 3D model. The customer reported about 90% less manual review.',
+	'Shipped transcription for noisy meetings: 0.12 word error rate on German speech, where the commercial tool we compared it with got 0.20.',
+	'Built an invoice pipeline that knows when it is unsure and asks for the missing context. It automated about 90% of the workflow.',
 	'Gave 5+ talks on Python, ML and MLOps to students at Lviv University.',
+	'Won an INOVA gold medal for research on alpha decay.',
 	'Built a voice assistant that lives on a Raspberry Pi.'
 ];
 
@@ -272,12 +279,20 @@ export const hobbies = [
 export const photos = [
 	{
 		src: '/images/drone_flight.png',
+		webp: '/images/drone_flight.webp',
 		alt: 'FPV drone in flight',
 		caption: 'FPV drones',
 		width: 760,
 		height: 507
 	},
-	{ src: '/images/bouldering.png', alt: 'Climbing', caption: 'Climbing', width: 396, height: 592 },
+	{
+		src: '/images/bouldering.png',
+		webp: '/images/bouldering.webp',
+		alt: 'Climbing',
+		caption: 'Climbing',
+		width: 396,
+		height: 592
+	},
 	{
 		src: '/images/cycling.jpg',
 		alt: 'Cycling outdoors',
@@ -313,7 +328,7 @@ export const stack = [
 
 export const contact = {
 	heading: 'Want to chat?',
-	body: "If you're working on something interesting — research, AI, physics software, a prototype, or a slightly chaotic idea — feel free to reach out.",
+	body: "If you're working on something interesting - research, AI, physics software, a prototype, or a slightly chaotic idea - feel free to reach out.",
 	hint: "A few lines are enough. Tell me what you're doing and what you're looking for."
 };
 
@@ -329,7 +344,7 @@ export function formatResult(result: Result, value = result.value): string {
 export const kolo = {
 	github: 'https://github.com/ArtDoctor/Kolo-music',
 	pitch:
-		"I got tired of Spotify recommending music I don't actually like, so, like any sane ML engineer, I decided to build my own Spotify — with some ML experiments and questionable amounts of tinkering along the way.",
+		"I got tired of Spotify recommending music I don't actually like, so, like any sane ML engineer, I decided to build my own Spotify - with some ML experiments and questionable amounts of tinkering along the way.",
 	steps: [
 		{
 			title: 'Listen',
@@ -410,4 +425,10 @@ export const solar = {
 		{ day: 'Oct 11', score: 0.4, note: 'Rank-averaged scores' }
 	],
 	credit: 'Image: GONG H-alpha, National Solar Observatory. Expert outlines: the MAGFiLO dataset.'
+};
+
+/** The hero's "now" line. Swap it when something newer is going on. */
+export const now = {
+	text: `${solar.standing} in a Kaggle competition on solar filaments`,
+	href: '/portfolio/solar'
 };

@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { projects, type Project } from '$lib/content';
+	import ProjectVisual from '$lib/visuals/ProjectVisual.svelte';
 
 	let active = $state(0);
 
@@ -24,7 +25,7 @@
 					<span class="arrow" aria-hidden="true">{project.page ? '→' : '↗'}</span>
 					<span class="more">
 						<span>
-							<img src={project.image} alt="" loading="lazy" />
+							<span class="thumb plate"><ProjectVisual {project} /></span>
 							<span class="desc">{project.description}</span>
 							{#if project.page}
 								<span class="tag mono">full write-up →</span>
@@ -39,7 +40,9 @@
 	<aside class="viewer" aria-hidden="true">
 		<div class="plate">
 			{#each projects as project, i}
-				<img src={project.image} alt="" class:on={active === i} loading="lazy" />
+				<div class="slide" class:on={active === i}>
+					<ProjectVisual {project} active={active === i} />
+				</div>
 			{/each}
 		</div>
 		<p class="mono">

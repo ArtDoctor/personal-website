@@ -31,28 +31,3 @@ export function reveal(node: HTMLElement, options: RevealOptions = {}) {
 export function prefersReducedMotion(): boolean {
 	return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 }
-
-/** Eases a number from 0 to `to`, calling `onupdate` every frame. Returns a cancel function. */
-export function countUp(
-	to: number,
-	onupdate: (value: number) => void,
-	duration = 1400
-): () => void {
-	if (prefersReducedMotion()) {
-		onupdate(to);
-		return () => {};
-	}
-
-	const start = performance.now();
-	let frame = 0;
-
-	const tick = (now: number) => {
-		const t = Math.min(1, (now - start) / duration);
-		const eased = 1 - Math.pow(1 - t, 4);
-		onupdate(to * eased);
-		if (t < 1) frame = requestAnimationFrame(tick);
-	};
-
-	frame = requestAnimationFrame(tick);
-	return () => cancelAnimationFrame(frame);
-}

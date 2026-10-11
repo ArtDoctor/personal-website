@@ -2,7 +2,7 @@
 	import PoolTable from '$lib/components/pool/PoolTable.svelte';
 	import { ballBackground } from '$lib/components/pool/pool';
 	import { reveal } from '$lib/actions/reveal';
-	import { about, hobbies, languages, languagesNote, person } from '$lib/content';
+	import { about, hobbies, person } from '$lib/content';
 	import PhotoStrip from '$lib/site/PhotoStrip.svelte';
 
 	let potted = $state(hobbies.map(() => false));
@@ -10,9 +10,6 @@
 	let table: PoolTable | undefined = $state();
 
 	const pottedCount = $derived(potted.filter(Boolean).length);
-
-	/** Six-step proficiency meter: which segments are filled. */
-	const segments = (filled: number) => Array.from({ length: 6 }, (_, i) => i < filled);
 
 	function rerack() {
 		potted = hobbies.map(() => false);
@@ -37,8 +34,7 @@
 </section>
 
 <section class="band" data-tone="dark">
-	<header class="head" use:reveal>
-		<span class="num mono">01</span>
+	<header class="head plain" use:reveal>
 		<h2>Pot a hobby.</h2>
 		<p class="lede">
 			Every ball is something I do when I am not at a keyboard. The physics is real: elastic
@@ -92,36 +88,3 @@
 		</div>
 	</div>
 </section>
-
-<section class="band">
-	<header class="head" use:reveal>
-		<span class="num mono">02</span>
-		<h2>Languages I speak.</h2>
-		<p class="lede">{languagesNote}</p>
-	</header>
-
-	<div class="languages wide">
-		<ul>
-			{#each languages as language}
-				<li>
-					<span>{language.name}</span>
-					<span class="level mono">{language.level}</span>
-					<span class="meter6" aria-hidden="true">
-						{#each segments(language.progress) as on}
-							<i class:on></i>
-						{/each}
-					</span>
-				</li>
-			{/each}
-		</ul>
-	</div>
-</section>
-
-<style>
-	.wide ul {
-		display: grid;
-		grid-template-columns: repeat(auto-fit, minmax(min(100%, 22rem), 1fr));
-		gap: 0 clamp(24px, 5vw, 80px);
-		border-top: 1px solid var(--line);
-	}
-</style>

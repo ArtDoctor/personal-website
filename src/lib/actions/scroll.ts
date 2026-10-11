@@ -29,39 +29,45 @@ export function scrub(node: HTMLElement) {
 	};
 }
 
-/** Lets a mouse drag a horizontally scrolling strip. Touch and trackpads already can. */
-export function dragScroll(node: HTMLElement) {
-	let startX = 0;
-	let startScroll = 0;
-	let dragging = false;
+/**
+ * Moves a horizontally scrolling strip with the mouse, no dragging: with the pointer at the
+ * left it shows the start, at the right the end, and in between it follows. Touch and
+ * trackpads scroll it the usual way.
+ */
+export function hoverScroll(node: HTMLElement) {
+	/** How much of the width at each side already counts as the edge. */
+	const EDGE = 0.14;
+	const instant = prefersReducedMotion();
 
-	const down = (event: PointerEvent) => {
-		if (event.pointerType !== 'mouse') return;
-		dragging = true;
-		startX = event.clientX;
-		startScroll = node.scrollLeft;
-		node.setPointerCapture(event.pointerId);
-		node.classList.add('is-dragging');
+	let position = 0;
+	let target = 0;
+	let frame = 0;
+
+	const glide = () => {
+		position += (target - position) * 0.1;
+		if (Math.abs(target - position) < 0.5) position = target;
+		node.scrollLeft = position;
+		frame = position === target ? 0 : requestAnimationFrame(glide);
 	};
 	const move = (event: PointerEvent) => {
-		if (dragging) node.scrollLeft = startScroll - (event.clientX - startX);
+		if (event.pointerType !== 'mouse') return;
+		const rect = node.getBoundingClientRect();
+		const along = ((event.clientX - rect.left) / rect.width - EDGE) / (1 - EDGE * 2);
+		target = Math.min(1, Math.max(0, along)) * (node.scrollWidth - node.clientWidth);
+		if (instant) node.scrollLeft = target;
+		else if (!frame) frame = requestAnimationFrame(glide);
 	};
-	const up = () => {
-		dragging = false;
-		node.classList.remove('is-dragging');
-	};
+	// Start from wherever a wheel or a finger left it.
+	const enter = () => (position = node.scrollLeft);
 
-	node.addEventListener('pointerdown', down);
+	node.addEventListener('pointerenter', enter);
 	node.addEventListener('pointermove', move);
-	node.addEventListener('pointerup', up);
-	node.addEventListener('pointercancel', up);
 
 	return {
 		destroy() {
-			node.removeEventListener('pointerdown', down);
+			cancelAnimationFrame(frame);
+			node.removeEventListener('pointerenter', enter);
 			node.removeEventListener('pointermove', move);
-			node.removeEventListener('pointerup', up);
-			node.removeEventListener('pointercancel', up);
 		}
 	};
 }

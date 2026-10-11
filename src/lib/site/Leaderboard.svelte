@@ -219,7 +219,7 @@
 
 	.value {
 		fill: var(--fg);
-		font-family: var(--sans);
+		font-family: var(--display);
 		font-size: 15px;
 		font-stretch: 112%;
 		font-weight: 650;
@@ -261,6 +261,7 @@
 	}
 
 	.tip strong {
+		font-family: var(--display);
 		font-size: 1.25rem;
 		font-stretch: 112%;
 		font-variant-numeric: tabular-nums;
