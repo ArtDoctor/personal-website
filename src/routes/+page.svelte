@@ -1,155 +1,239 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import { countUp, prefersReducedMotion, reveal } from '$lib/actions/reveal';
+	import { scrub } from '$lib/actions/scroll';
+	import {
+		about,
+		alsoTrue,
+		contact,
+		formatResult,
+		languages,
+		languagesNote,
+		person,
+		projects,
+		results,
+		stack,
+		traits,
+		type Project
+	} from '$lib/content';
+	import Articles from '$lib/site/Articles.svelte';
+	import ContactBlock from '$lib/site/ContactBlock.svelte';
+	import Hero from '$lib/site/Hero.svelte';
+	import PhotoStrip from '$lib/site/PhotoStrip.svelte';
 
-	let showHero = $state(false);
+	let { data } = $props();
 
-	const languages = [
-		{ name: '🇬🇧 English', level: 'C2', progress: 6 },
-		{ name: '🇺🇦 Ukrainian', level: 'C2', progress: 6 },
-		{ name: 'Russian', level: 'C2', progress: 6 },
-		{ name: '🇩🇪 German', level: 'B1', progress: 3 },
-		{ name: '🇨🇿 Czech', level: 'A2', progress: 2 },
-		{ name: '🇨🇳 Chinese', level: 'HSK2', progress: 2 }
-	];
+	const featured = projects.slice(0, 4);
+	const href = (project: Project) => (project.page ? `/portfolio/${project.page}` : project.link);
 
-	const techRows = [
-		{
-			label: 'AI & data',
-			src: 'https://skillicons.dev/icons?i=py,tensorflow,pytorch,sklearn,fastapi,flask,anaconda'
-		},
-		{
-			label: 'Web',
-			src: 'https://skillicons.dev/icons?i=js,ts,bun,html,css,tailwind,svelte,react,vite'
-		},
-		{ label: 'Systems', src: 'https://skillicons.dev/icons?i=cs,cpp' },
-		{
-			label: 'Databases',
-			src: 'https://skillicons.dev/icons?i=postgres,mysql,sqlite,redis,supabase'
-		},
-		{
-			label: 'Tools',
-			src: 'https://skillicons.dev/icons?i=figma,gcp,azure,bash,ubuntu,git,github,blender,unity,docker'
-		}
-	];
+	let shown = $state(results.map((result) => result.value));
+
+	// The "<1 min" row counts down from an hour instead of up from zero.
+	const countFrom = (value: number) => (value === 1 ? 60 : 0);
+
+	let wordIndex = 0;
+	const aboutWords = about.map((paragraph) =>
+		paragraph.split(' ').map((word) => ({ word, index: wordIndex++ }))
+	);
+	const wordCount = wordIndex;
+
+	/** Six-step proficiency meter: which segments are filled. */
+	const segments = (filled: number) => Array.from({ length: 6 }, (_, i) => i < filled);
 
 	onMount(() => {
-		showHero = true;
+		if (!prefersReducedMotion()) shown = results.map((result) => countFrom(result.value));
 	});
+
+	function runCount(i: number) {
+		const result = results[i];
+		const from = countFrom(result.value);
+		countUp(1, (t) => (shown[i] = from + (result.value - from) * t));
+	}
 </script>
 
-<!-- ═══ Hero ═══ -->
-<section
-	class="grid min-h-[70vh] items-center gap-12 py-16 transition duration-1000 lg:grid-cols-[0.9fr_1.1fr] lg:py-24"
-	class:translate-y-4={!showHero}
-	class:opacity-0={!showHero}
-	class:opacity-100={showHero}
->
-	<div class="order-2 lg:order-1">
-		<div class="relative mx-auto max-w-sm">
-			<div class="absolute -left-3 -top-3 h-6 w-6 border-l border-t border-accent/40"></div>
-			<div class="absolute -bottom-3 -right-3 h-6 w-6 border-b border-r border-accent/40"></div>
-			<div class="card overflow-hidden p-2">
-				<img src="/images/mai.png" alt="Portrait of Artem" class="w-full rounded object-contain" />
-			</div>
-		</div>
-	</div>
+<svelte:head>
+	<title>{person.name}</title>
+	<meta name="description" content={person.intro} />
+</svelte:head>
 
-	<div class="order-1 text-center lg:order-2 lg:text-left">
-		<p class="eyebrow mb-4">Physics · data · building things</p>
-		<h1 class="heading text-5xl sm:text-6xl lg:text-7xl">
-			Hi, I'm Artem<a
-				href="#artemis-note"
-				class="align-super text-3xl text-accent sm:text-4xl lg:text-5xl">*</a
-			>
-		</h1>
-		<p id="artemis-note" class="mt-3 text-sm text-gray-600">
-			* yes, like <a
-				href="https://www.nasa.gov/humans-in-space/artemis/"
-				target="_blank"
-				rel="noopener noreferrer"
-				class="text-accent-light underline decoration-accent/30 underline-offset-4 transition hover:text-accent"
-				>Artemis</a
-			>, the NASA mission
-		</p>
-		<p class="mt-6 max-w-2xl text-lg leading-8 text-gray-400 sm:text-xl sm:leading-9">
-			I study physics, write code, and like making weird ideas actually work. Sometimes that means
-			ML models, sometimes simulations, sometimes just a lot of debugging.
-		</p>
-		<div class="mt-8 flex flex-col justify-center gap-3 sm:flex-row lg:justify-start">
-			<a class="btn-primary" href="/projects">See projects</a>
-			<a class="btn-secondary" href="/about">About me</a>
+<Hero />
+
+<!-- ═══ About ═══ -->
+<section class="band" id="about" data-tone="dark">
+	<header class="head" use:reveal>
+		<span class="num mono">01</span>
+		<h2>A bit about me.</h2>
+	</header>
+
+	<div class="about-grid">
+		<figure class="portrait" use:reveal>
+			<div class="frame">
+				<img src="/images/mai.png" alt="Portrait of Artem" width="561" height="701" />
+			</div>
+			<figcaption class="mono">fig. 1 · the author · {person.city}, from {person.from}</figcaption>
+		</figure>
+
+		<div>
+			<div class="words" use:scrub>
+				{#each aboutWords as paragraph}
+					<p>
+						{#each paragraph as { word, index }}
+							<span style:--i={index / wordCount}>{word}</span>{' '}
+						{/each}
+					</p>
+				{/each}
+			</div>
+
+			<dl class="traits">
+				{#each traits as trait}
+					<div>
+						<dt class="mono">{trait.label.toLowerCase()}</dt>
+						<dd>{trait.value}</dd>
+					</div>
+				{/each}
+			</dl>
 		</div>
 	</div>
 </section>
 
-<hr class="divider" />
+<!-- ═══ Selected work ═══ -->
+<section class="band" id="work">
+	<header class="head" use:reveal>
+		<span class="num mono">02</span>
+		<h2>Some things I've built.</h2>
+		<p class="lede">
+			Mostly physics, simulation, and machine-learning experiments — the kind of projects where I
+			learn by making the thing work.
+		</p>
+	</header>
 
-<!-- ═══ Tech Stack ═══ -->
-<section class="py-12 sm:py-16">
-	<div class="mb-8 flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
-		<div>
-			<p class="eyebrow mb-3">Stack</p>
-			<h2 class="heading text-3xl sm:text-4xl">Tools I reach for</h2>
-		</div>
-		<a
-			href="https://skillicons.dev"
-			target="_blank"
-			rel="noopener noreferrer"
-			class="text-sm text-gray-600 transition hover:text-accent"
-		>
-			Icons by skillicons
+	<ol class="featured">
+		{#each featured as project, i}
+			<li use:reveal>
+				<a
+					href={href(project)}
+					target={project.page ? undefined : '_blank'}
+					rel={project.page ? undefined : 'noopener noreferrer'}
+				>
+					<span class="plate"><img src={project.image} alt="" loading="lazy" /></span>
+					<span class="idx mono">{String(i + 1).padStart(2, '0')}</span>
+					<span class="title">{project.title}</span>
+					<span class="arrow" aria-hidden="true">{project.page ? '→' : '↗'}</span>
+					<span class="desc">{project.description}</span>
+					<span class="stack mono">{project.stack}</span>
+				</a>
+			</li>
+		{/each}
+	</ol>
+
+	<div class="buttons after">
+		<a href="/portfolio" class="btn solid">
+			All {projects.length} projects, and the small ones <span>→</span>
 		</a>
 	</div>
+</section>
 
-	<div class="grid gap-3">
-		{#each techRows as row}
-			<div
-				class="card card-hover flex flex-col gap-4 p-5 sm:flex-row sm:items-center sm:justify-between"
-			>
-				<span class="text-xs font-medium uppercase tracking-[0.2em] text-gray-600">{row.label}</span
+<!-- ═══ Results ═══ -->
+<section class="band" id="results" data-tone="dark">
+	<header class="head" use:reveal>
+		<span class="num mono">03</span>
+		<h2>Things that worked.</h2>
+		<p class="lede">Not a CV. Just a few numbers I'm still pleased about.</p>
+	</header>
+
+	<ol class="rows">
+		{#each results as result, i}
+			<li use:reveal={{ threshold: 0.6, onenter: () => runCount(i) }}>
+				<span class="value" aria-label={formatResult(result)}>{formatResult(result, shown[i])}</span
 				>
-				<img
-					src={row.src}
-					alt={`${row.label} technology icons`}
-					class="max-w-full self-start sm:self-center"
-					loading="lazy"
-				/>
-			</div>
+				<span class="mono">{result.label}</span>
+				<p class="note">{result.note}</p>
+			</li>
 		{/each}
+	</ol>
+
+	<ul class="also mono">
+		{#each alsoTrue as item}
+			<li>{item}</li>
+		{/each}
+	</ul>
+</section>
+
+<!-- ═══ Writing ═══ -->
+<section class="band" id="writing">
+	<header class="head" use:reveal>
+		<span class="num mono">04</span>
+		<h2>Latest writing.</h2>
+		<p class="lede">
+			The latest three articles from my Medium blog about AI, data science, Linux, and things I'm
+			learning while building.
+		</p>
+	</header>
+
+	<Articles articles={data.mediumArticles} />
+	<p class="after">
+		<a href="/medium" class="text-link">More about the writing →</a>
+	</p>
+</section>
+
+<!-- ═══ Off duty ═══ -->
+<section class="band" id="off-duty" data-tone="dark">
+	<header class="head" use:reveal>
+		<span class="num mono">05</span>
+		<h2>Off duty.</h2>
+		<p class="lede">{about[3]}</p>
+	</header>
+
+	<PhotoStrip />
+	<div class="buttons after">
+		<a href="/hobbies" class="btn solid">All the hobbies, and a pool table <span>→</span></a>
 	</div>
 </section>
 
-<hr class="divider" />
+<!-- ═══ Tools and languages ═══ -->
+<section class="band" id="kit">
+	<header class="head" use:reveal>
+		<span class="num mono">06</span>
+		<h2>Tools I reach for.</h2>
+	</header>
 
-<!-- ═══ Languages ═══ -->
-<section class="py-12 sm:py-16">
-	<div class="card p-6 sm:p-8 lg:p-10">
-		<div class="mb-8 flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
-			<div>
-				<p class="eyebrow mb-3">Languages</p>
-				<h2 class="heading text-3xl sm:text-4xl">Languages I speak</h2>
-			</div>
-			<p class="max-w-md text-sm leading-6 text-gray-600">
-				Useful for reading papers, moving countries, and occasionally ordering coffee correctly.
-			</p>
-		</div>
-
-		<div class="grid gap-3 md:grid-cols-2">
-			{#each languages as lang}
-				<div class="rounded-lg border border-border bg-surface p-4">
-					<div class="mb-3 flex items-center justify-between gap-4">
-						<span class="font-medium text-gray-300">{lang.name}</span>
-						<span class="tag">{lang.level}</span>
-					</div>
-					<div class="flex gap-1.5" aria-label={`${lang.name} proficiency ${lang.level}`}>
-						{#each Array(6).fill(0) as _, i}
-							<div
-								class={`h-2 flex-1 rounded-full ${i < lang.progress ? 'bg-gradient-to-r from-accent to-accent-light' : 'bg-white/5'}`}
-							></div>
-						{/each}
-					</div>
+	<div class="kit-grid">
+		<dl class="stack-list">
+			{#each stack as group}
+				<div>
+					<dt class="mono">{group.label.toLowerCase()}</dt>
+					<dd>{group.items.join(', ')}</dd>
 				</div>
 			{/each}
+		</dl>
+
+		<div class="languages">
+			<h3>Languages I speak</h3>
+			<ul>
+				{#each languages as language}
+					<li>
+						<span>{language.name}</span>
+						<span class="level mono">{language.level}</span>
+						<span class="meter6" aria-hidden="true">
+							{#each segments(language.progress) as on}
+								<i class:on></i>
+							{/each}
+						</span>
+					</li>
+				{/each}
+			</ul>
+			<p class="note">{languagesNote}</p>
 		</div>
 	</div>
+</section>
+
+<!-- ═══ Contact ═══ -->
+<section class="band" id="contact" data-tone="dark">
+	<header class="head" use:reveal>
+		<span class="num mono">07</span>
+		<h2>{contact.heading}</h2>
+		<p class="lede">{contact.body}</p>
+	</header>
+
+	<ContactBlock />
 </section>
