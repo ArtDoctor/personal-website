@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import { prefersReducedMotion } from '$lib/actions/reveal';
 	import { BALLS } from './pool';
 
 	type Props = {
@@ -7,13 +8,15 @@
 		labels: string[];
 		onpot?: (index: number) => void;
 		onshot?: () => void;
+		/** The last object ball has gone down. */
+		onclear?: (result: { shots: number; seconds: number }) => void;
 		/** Cloth colour. */
 		felt?: string;
 		/** Colour of the rail sights and the cue. */
 		trim?: string;
 	};
 
-	let { labels, onpot, onshot, felt = '#178a5c', trim = '#ffd12e' }: Props = $props();
+	let { labels, onpot, onshot, onclear, felt = '#178a5c', trim = '#ffd12e' }: Props = $props();
 
 	let canvas: HTMLCanvasElement;
 
@@ -30,6 +33,14 @@
 	const BALL_BOUNCE = 0.97;
 	const CUSHION_BOUNCE = 0.82;
 	const SUBSTEPS = 6;
+
+	// Confetti, for clearing the table: thrown up out of the pockets, held back by the air,
+	// and drifting down onto the cloth. Heights are in table units too.
+	const SCRAPS_PER_POCKET = 26;
+	const GRAVITY = 5;
+	const AIR = 1.4;
+	const FALL = 0.5;
+	const PARTY = 4.5;
 
 	const RAIL = '#111114';
 	const CHALK = '#fbfaf5';
@@ -48,10 +59,30 @@
 
 	type Toast = { text: string; u: number; v: number; age: number };
 
+	/** A scrap of confetti. `z` is its height above the cloth; `flip` turns it over as it falls. */
+	type Scrap = {
+		u: number;
+		v: number;
+		z: number;
+		du: number;
+		dv: number;
+		dz: number;
+		angle: number;
+		spin: number;
+		flip: number;
+		color: string;
+		landed: boolean;
+	};
+
 	let balls: Ball[] = [];
 	let toasts: Toast[] = [];
+	let confetti: Scrap[] = [];
 	let aspect = 2;
 	let hasShot = false;
+	let shots = 0;
+	let firstShotAt = 0;
+	/** When the table was cleared, in seconds on the animation clock, or -1 while it is not. */
+	let clearedAt = -1;
 
 	function rackBalls() {
 		const count = labels.length;
@@ -75,7 +106,10 @@
 			}
 		});
 		toasts = [];
+		confetti = [];
 		hasShot = false;
+		shots = 0;
+		clearedAt = -1;
 	}
 
 	/** Puts every ball back. */
@@ -101,8 +135,72 @@
 			((nearest.u - cue.u) / length - wobble * ((nearest.v - cue.v) / length)) * MAX_SPEED * 0.95;
 		cue.dv =
 			((nearest.v - cue.v) / length + wobble * ((nearest.u - cue.u) / length)) * MAX_SPEED * 0.95;
+		countShot();
+	}
+
+	function countShot() {
+		if (!hasShot) firstShotAt = performance.now();
 		hasShot = true;
+		shots++;
 		onshot?.();
+	}
+
+	function clear() {
+		clearedAt = performance.now() / 1000;
+		onclear?.({ shots, seconds: (performance.now() - firstShotAt) / 1000 });
+		if (!prefersReducedMotion()) burst();
+	}
+
+	/** Every pocket throws a handful of confetti in the colours of the balls it swallowed. */
+	function burst() {
+		const colours = [...new Set(BALLS.map((ball) => ball.color)), CHALK, trim];
+		pockets().forEach(([pu, pv]) => {
+			const inward = Math.atan2(0.5 - pv, aspect / 2 - pu);
+			for (let i = 0; i < SCRAPS_PER_POCKET; i++) {
+				const angle = inward + (Math.random() - 0.5) * 1.7;
+				const speed = 0.25 + Math.random() * 1.4;
+				confetti.push({
+					u: pu,
+					v: pv,
+					z: 0,
+					du: Math.cos(angle) * speed,
+					dv: Math.sin(angle) * speed,
+					dz: 1.4 + Math.random() * 1.8,
+					angle: Math.random() * Math.PI * 2,
+					spin: (Math.random() - 0.5) * 16,
+					flip: Math.random() * Math.PI * 2,
+					color: colours[Math.floor(Math.random() * colours.length)],
+					landed: false
+				});
+			}
+		});
+	}
+
+	function flutter(dt: number) {
+		const holes = pockets();
+		const drag = Math.exp(-AIR * dt);
+		for (const scrap of confetti) {
+			if (scrap.landed) continue;
+			// Paper: it rises like anything thrown, but falls no faster than it can flutter.
+			scrap.dz = Math.max(-FALL, scrap.dz - GRAVITY * dt);
+			scrap.du = scrap.du * drag + Math.sin(scrap.flip) * 0.35 * dt;
+			scrap.dv *= drag;
+			scrap.u += scrap.du * dt;
+			scrap.v += scrap.dv * dt;
+			scrap.z += scrap.dz * dt;
+			scrap.angle += scrap.spin * dt;
+			scrap.flip += 9 * dt;
+			if (scrap.z <= 0 && scrap.dz < 0) {
+				scrap.z = 0;
+				scrap.landed = true;
+			}
+		}
+		// Whatever lands on a pocket falls in.
+		confetti = confetti.filter(
+			(scrap) =>
+				!scrap.landed ||
+				holes.every(([pu, pv]) => Math.hypot(scrap.u - pu, scrap.v - pv) > POCKET * 0.8)
+		);
 	}
 
 	function distance(a: Ball, b: Ball): number {
@@ -134,7 +232,10 @@
 				ball.v += (pv - ball.v) * 0.2;
 				if (ball.sinking === 1) {
 					if (ball.id === 0) respotCue(ball);
-					else ball.gone = true;
+					else {
+						ball.gone = true;
+						if (clearedAt < 0 && balls.every((other) => other.id === 0 || other.gone)) clear();
+					}
 				}
 				continue;
 			}
@@ -318,6 +419,32 @@
 			ctx.globalAlpha = 1;
 		}
 
+		function drawScrap(scrap: Scrap) {
+			const x = toX(scrap.u, scrap.v);
+			const y = toY(scrap.u, scrap.v);
+			const size = RADIUS * unit * 0.42;
+
+			// Its shadow on the cloth, further off the higher it is, the way the balls' fall.
+			if (!scrap.landed) {
+				ctx.fillStyle = `rgba(0, 0, 0, ${0.22 * Math.max(0, 1 - scrap.z)})`;
+				ctx.fillRect(
+					x + scrap.z * unit * 0.3 - size * 0.4,
+					y + scrap.z * unit * 0.4 - size * 0.25,
+					size * 0.8,
+					size * 0.5
+				);
+			}
+
+			const lift = 1 + scrap.z * 1.4;
+			ctx.save();
+			ctx.translate(x, y);
+			ctx.rotate(scrap.angle);
+			ctx.scale(lift, lift * (scrap.landed ? 0.85 : 0.15 + 0.85 * Math.abs(Math.cos(scrap.flip))));
+			ctx.fillStyle = scrap.color;
+			ctx.fillRect(-size / 2, -size * 0.3, size, size * 0.6);
+			ctx.restore();
+		}
+
 		function draw(time: number) {
 			ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 			ctx.clearRect(0, 0, width, height);
@@ -332,14 +459,27 @@
 			ctx.roundRect(rail, rail, width - rail * 2, height - rail * 2, rail * 0.18);
 			ctx.fill();
 
-			// Sights on the rail, and the head string the cue ball starts on.
+			// After a clear the party runs for a few seconds and then winds down.
+			const since = clearedAt < 0 ? -1 : time - clearedAt;
+			const party = since < 0 ? 0 : Math.min(1, Math.max(0, PARTY - since));
+
+			// Sights on the rail, and the head string the cue ball starts on. During the party
+			// they chase round the table like the lights on an arcade cabinet.
 			ctx.fillStyle = trim;
 			const sightOffset = (rail * 0.5) / unit;
 			for (let i = 1; i < 8; i++) {
 				if (i === 4) continue;
-				for (const v of [-sightOffset, 1 + sightOffset]) {
+				for (const [side, v] of [-sightOffset, 1 + sightOffset].entries()) {
+					const lap = side ? 15 - i : i;
+					const glow = party * Math.max(0, Math.sin(time * 11 - lap * 0.8)) ** 3;
 					ctx.beginPath();
-					ctx.arc(toX((aspect * i) / 8, v), toY((aspect * i) / 8, v), rail * 0.07, 0, Math.PI * 2);
+					ctx.arc(
+						toX((aspect * i) / 8, v),
+						toY((aspect * i) / 8, v),
+						rail * (0.07 + glow * 0.1),
+						0,
+						Math.PI * 2
+					);
 					ctx.fill();
 				}
 			}
@@ -355,6 +495,21 @@
 				ctx.beginPath();
 				ctx.arc(toX(pu, pv), toY(pu, pv), POCKET * unit * 0.92, 0, Math.PI * 2);
 				ctx.fill();
+			}
+
+			// The moment of the clear: a ring goes out from every pocket.
+			if (since >= 0 && since < 0.8) {
+				ctx.strokeStyle = trim;
+				ctx.lineWidth = 3 * (1 - since / 0.8);
+				for (const [pu, pv] of pockets()) {
+					ctx.beginPath();
+					ctx.arc(toX(pu, pv), toY(pu, pv), POCKET * unit * (1 + since * 7), 0, Math.PI * 2);
+					ctx.stroke();
+				}
+			}
+
+			for (const scrap of confetti) {
+				if (scrap.landed) drawScrap(scrap);
 			}
 
 			const cue = balls[0];
@@ -436,6 +591,10 @@
 				if (!ball.gone) drawBall(ball);
 			}
 
+			for (const scrap of confetti) {
+				if (!scrap.landed) drawScrap(scrap);
+			}
+
 			// The hobby you just potted floats up out of the pocket.
 			ctx.font = `700 14px ${family}`;
 			ctx.textBaseline = 'middle';
@@ -471,6 +630,7 @@
 			for (let i = 0; i < SUBSTEPS; i++) step(delta / SUBSTEPS);
 			for (const toast of toasts) toast.age += delta;
 			toasts = toasts.filter((toast) => toast.age < 1.6);
+			flutter(delta);
 			draw(now / 1000);
 		}
 
@@ -499,8 +659,7 @@
 			const speed = (Math.min(MAX_PULL, length) / MAX_PULL) * MAX_SPEED;
 			cue.du = (pullU / length) * speed;
 			cue.dv = (pullV / length) * speed;
-			hasShot = true;
-			onshot?.();
+			countShot();
 		}
 
 		const resizeObserver = new ResizeObserver(resize);

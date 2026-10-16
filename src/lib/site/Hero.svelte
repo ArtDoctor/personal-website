@@ -12,21 +12,6 @@
 	/** Height of the strip the top bar sits over. */
 	const BAR = 56;
 
-	/** Share of the viewport that is dark: under the disc, or already past the hero. */
-	function shadowed(heroBottom: number, x: number, y: number, radius: number) {
-		const cols = 32;
-		const rows = 20;
-		let dark = 0;
-		for (let i = 0; i < cols; i++) {
-			const px = ((i + 0.5) / cols) * window.innerWidth;
-			for (let j = 0; j < rows; j++) {
-				const py = ((j + 0.5) / rows) * window.innerHeight;
-				if (py > heroBottom || (px - x) ** 2 + (py - y) ** 2 < radius * radius) dark++;
-			}
-		}
-		return dark / (cols * rows);
-	}
-
 	onMount(() => {
 		const still = prefersReducedMotion();
 		let frame = 0;
@@ -52,9 +37,7 @@
 			hero.style.setProperty('--k', scale.toFixed(4));
 
 			const shadow = radius * scale;
-			eclipse.active = box.bottom > 0;
 			eclipse.progress = progress;
-			eclipse.coverage = shadowed(box.bottom, x, y, shadow);
 			eclipse.overhead = [0, window.innerWidth].every(
 				(px) => Math.hypot(px - x, y) < shadow && Math.hypot(px - x, BAR - y) < shadow
 			);
@@ -71,7 +54,6 @@
 			cancelAnimationFrame(frame);
 			window.removeEventListener('scroll', schedule);
 			window.removeEventListener('resize', schedule);
-			eclipse.active = false;
 			eclipse.progress = 0;
 			eclipse.overhead = false;
 		};
@@ -84,8 +66,13 @@
 	<!-- The disc. It sits under the field, so the bodies cross it in white, and it grows as the
 	     page scrolls until the whole hero is in its shadow. -->
 	<div class="under disc" aria-hidden="true"></div>
-	<!-- The corona. Drawn above the name so the letters do not invert it. -->
-	<div class="rim" aria-hidden="true"><i></i></div>
+	<!-- The corona. Drawn above the name so the letters do not invert it. An SVG stroke rather
+	     than a bordered round box: GPU rasterisers can leave seams across a box that large. -->
+	<svg class="rim" aria-hidden="true">
+		<circle
+			style="cx: var(--disc-x); cy: var(--disc-y); r: calc(var(--disc-size) / 2 * var(--k, 1) + 14px)"
+		/>
+	</svg>
 
 	<!-- Everything below is white text blended as a difference: black on the page, white wherever
 	     the disc is under it. Orange cannot survive that, so there is none in here. -->
@@ -165,20 +152,18 @@
 		position: absolute;
 		inset: 0;
 		z-index: 3;
+		width: 100%;
+		height: 100%;
 		overflow: hidden;
 		pointer-events: none;
+		transform-origin: var(--disc-x) var(--disc-y);
+		animation: appear 1.4s var(--ease) both;
 	}
 
-	.rim i {
-		position: absolute;
-		top: var(--disc-y);
-		left: var(--disc-x);
-		width: calc(var(--disc-size) * var(--k, 1) + 28px);
-		aspect-ratio: 1;
-		border: 1px solid var(--hot);
-		border-radius: 50%;
-		translate: -50% -50%;
-		animation: appear 1.4s var(--ease) both;
+	.rim circle {
+		fill: none;
+		stroke: var(--hot);
+		stroke-width: 1px;
 	}
 
 	.title,

@@ -82,7 +82,7 @@ export const projects: Project[] = [
 		slug: 'solar',
 		title: 'Solar Filaments',
 		description:
-			'A Kaggle competition: find every filament on full-disk images of the Sun and draw its exact outline. A detector proposes, a small U-Net draws, five models vote. Top 100 right now.',
+			'A Kaggle competition: find every filament on full-disk images of the Sun and draw its exact outline. A detector proposes, a small U-Net draws, five models vote. Top 10% right now.',
 		stack: 'YOLO · U-Net · instance segmentation',
 		link: 'https://www.kaggle.com/competitions/filament-segmentation-2026',
 		linkLabel: 'Kaggle',
@@ -105,8 +105,8 @@ export const projects: Project[] = [
 		description:
 			"A home for the startups I've worked on with my co-founder - small bets, experiments, and products we're trying to make real.",
 		stack: 'Startups · LLM products · retrieval',
-		link: 'https://www.yazero.io/',
-		linkLabel: 'yazero.io',
+		link: 'https://validator.yazero.io/',
+		linkLabel: 'validator.yazero.io',
 		image: '/images/validator-by-yazero.webp'
 	},
 	{
@@ -387,7 +387,7 @@ export const solar = {
 	kaggle: 'https://www.kaggle.com/competitions/filament-segmentation-2026',
 	/** Add the repository link here once the competition allows sharing the code. */
 	github: null as string | null,
-	standing: 'Top 100',
+	standing: 'Top 10%',
 	standingNote: 'on the public leaderboard, October 2026. The competition runs until 15 November.',
 	score: 0.4,
 	task: 'Given a 2048 × 2048 image of the Sun in H-alpha light, find every filament and draw its exact outline, one mask per filament.',

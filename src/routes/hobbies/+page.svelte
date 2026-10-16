@@ -5,17 +5,46 @@
 	import { about, hobbies, person } from '$lib/content';
 	import PhotoStrip from '$lib/site/PhotoStrip.svelte';
 
+	/** Fewest shots anyone has cleared the table in, on this browser. */
+	const BEST = 'pool-best';
+
 	let potted = $state(hobbies.map(() => false));
 	let played = $state(false);
 	let table: PoolTable | undefined = $state();
+	let result = $state<{ shots: number; seconds: number; best: number; record: boolean } | null>(
+		null
+	);
 
 	const pottedCount = $derived(potted.filter(Boolean).length);
+
+	function cleared({ shots, seconds }: { shots: number; seconds: number }) {
+		let previous = 0;
+		try {
+			previous = Number(localStorage.getItem(BEST)) || 0;
+		} catch {
+			// No storage, no record to beat.
+		}
+		const record = !previous || shots < previous;
+		if (record) {
+			try {
+				localStorage.setItem(BEST, String(shots));
+			} catch {
+				// Still a record, just not one that will be remembered.
+			}
+		}
+		result = { shots, seconds, best: record ? shots : previous, record };
+	}
 
 	function rerack() {
 		potted = hobbies.map(() => false);
 		played = false;
+		result = null;
 		table?.rack();
 	}
+
+	const plural = (count: number) => `${count} ${count === 1 ? 'shot' : 'shots'}`;
+	const clock = (seconds: number) =>
+		`${Math.floor(seconds / 60)}:${String(Math.floor(seconds % 60)).padStart(2, '0')}`;
 </script>
 
 <svelte:head>
@@ -43,18 +72,29 @@
 	</header>
 
 	<div class="pool">
-		<PoolTable
-			bind:this={table}
-			labels={hobbies}
-			felt="#1d5a45"
-			trim="#ff4f1a"
-			onpot={(index) => (potted[index] = true)}
-			onshot={() => (played = true)}
-		/>
+		<div class="table">
+			<PoolTable
+				bind:this={table}
+				labels={hobbies}
+				felt="#1d5a45"
+				trim="#ff4f1a"
+				onpot={(index) => (potted[index] = true)}
+				onshot={() => (played = true)}
+				onclear={cleared}
+			/>
+
+			{#if result}
+				<div class="cleared" aria-hidden="true">
+					<span class="mono">table cleared</span>
+					<strong>{plural(result.shots)}</strong>
+					<span class="mono">{clock(result.seconds)}{result.record ? ' · new best' : ''}</span>
+				</div>
+			{/if}
+		</div>
 
 		<div>
 			<h3>
-				{#if pottedCount === hobbies.length}
+				{#if result || pottedCount === hobbies.length}
 					Table cleared.
 				{:else if played}
 					{pottedCount} of {hobbies.length} potted
@@ -63,7 +103,10 @@
 				{/if}
 			</h3>
 			<p class="how mono">
-				{#if pottedCount === hobbies.length}
+				{#if result}
+					All {hobbies.length} in {plural(result.shots)} and {clock(result.seconds)}.
+					{result.record ? 'Your best yet.' : `Your best is ${plural(result.best)}.`}
+				{:else if pottedCount === hobbies.length}
 					That's all of them.
 				{:else}
 					Drag back from the white ball and let go.

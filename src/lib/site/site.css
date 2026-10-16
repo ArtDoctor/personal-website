@@ -154,23 +154,6 @@
 	color: inherit;
 }
 
-.site .bar .readout {
-	position: absolute;
-	left: 50%;
-	color: var(--dim);
-	font-family: var(--mono);
-	font-size: 0.6875rem;
-	opacity: 0;
-	translate: -50% 0;
-	white-space: nowrap;
-	pointer-events: none;
-	transition: opacity 0.4s;
-}
-
-.site .bar .readout.on {
-	opacity: 1;
-}
-
 .site .bar .brand .short {
 	display: none;
 }
@@ -1049,6 +1032,51 @@
 	color: var(--dim);
 }
 
+.site .pool .table {
+	position: relative;
+}
+
+/* Stamped onto the cloth once the last ball drops, and out of the way of the pointer. */
+.site .pool .cleared {
+	position: absolute;
+	inset: 0;
+	display: grid;
+	place-content: center;
+	justify-items: center;
+	gap: 10px;
+	color: #fbfaf5;
+	text-align: center;
+	pointer-events: none;
+	animation: pool-stamp 0.6s var(--ease) 0.3s both;
+}
+
+.site .pool .cleared strong {
+	font-family: var(--display);
+	font-size: clamp(2.4rem, 7vw, 6rem);
+	font-stretch: var(--display-stretch);
+	font-weight: var(--display-weight);
+	line-height: 0.9;
+	letter-spacing: var(--display-track);
+	text-shadow: 0 0.05em 0 #111114;
+	text-transform: uppercase;
+}
+
+.site .pool .cleared .mono {
+	padding: 4px 8px;
+	background: #111114;
+}
+
+@keyframes pool-stamp {
+	from {
+		opacity: 0;
+		transform: scale(1.7);
+	}
+
+	55% {
+		opacity: 1;
+	}
+}
+
 .site .legend {
 	margin: 20px 0 24px;
 	border-top: 1px solid var(--line);
@@ -1460,10 +1488,6 @@
 	.site .head.plain .lede,
 	.site .head.slim .lede {
 		grid-column: 1;
-	}
-
-	.site .bar .readout {
-		display: none;
 	}
 
 	.site .featured .lead a {
