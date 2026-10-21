@@ -10,6 +10,8 @@ export const person = {
 	artemisUrl: 'https://www.nasa.gov/humans-in-space/artemis/'
 };
 
+export const siteUrl = 'https://www.shelamanov.com';
+
 export const links = {
 	github: 'https://github.com/ArtDoctor',
 	linkedin: 'https://www.linkedin.com/in/shelamanov/',

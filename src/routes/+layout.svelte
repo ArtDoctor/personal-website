@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { page } from '$app/state';
-	import { person } from '$lib/content';
+	import { person, siteUrl } from '$lib/content';
 	import { eclipse } from '$lib/site/eclipse.svelte';
 	import Orbits from '$lib/site/Orbits.svelte';
 	import '../app.css';
@@ -34,6 +34,12 @@
 </script>
 
 <svelte:window onscroll={() => (scrolled = window.scrollY)} />
+
+<svelte:head>
+	{#if !page.error}
+		<link rel="canonical" href={siteUrl + page.url.pathname} />
+	{/if}
+</svelte:head>
 
 <div class="site" class:ready style:--field-opacity={fieldOpacity}>
 	<Orbits />
