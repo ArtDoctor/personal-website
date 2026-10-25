@@ -2,6 +2,7 @@
 	import { onMount } from 'svelte';
 	import { prefersReducedMotion } from '$lib/actions/reveal';
 	import { BALLS } from './pool';
+	import clackUrl from './clack.wav';
 
 	type Props = {
 		/** One object ball per label. */
@@ -152,32 +153,36 @@
 	}
 
 	/*
-	 * The clack of two balls, made up on the spot: a burst of noise through a bright band-pass
-	 * for the knock, and a short high tone for the ring of hard resin. Audio can only start
-	 * from a click or a tap, so it wakes on the first shot.
+	 * The clack of two balls: a recording of two solid balls struck together ("billiard ball
+	 * clack" by Za-Games, CC0, freesound.org/s/539854), played a touch higher or lower each
+	 * time so a run of hits doesn't sound like one sample. Audio can only start from a click
+	 * or a tap, so it wakes on the first shot.
 	 */
 	let audio: AudioContext | null = null;
 	let master: GainNode | null = null;
-	let noise: AudioBuffer | null = null;
+	let sample: AudioBuffer | null = null;
 	let voices: number[] = [];
 
 	function wakeAudio() {
 		if (!audio) {
 			if (typeof AudioContext === 'undefined') return;
-			audio = new AudioContext();
-			master = audio.createGain();
-			master.gain.value = 0.5;
-			master.connect(audio.destination);
-			noise = audio.createBuffer(1, Math.ceil(audio.sampleRate * 0.06), audio.sampleRate);
-			const samples = noise.getChannelData(0);
-			for (let i = 0; i < samples.length; i++) samples[i] = Math.random() * 2 - 1;
+			const context = new AudioContext();
+			audio = context;
+			master = context.createGain();
+			master.gain.value = 0.6;
+			master.connect(context.destination);
+			fetch(clackUrl)
+				.then((response) => response.arrayBuffer())
+				.then((data) => context.decodeAudioData(data))
+				.then((buffer) => (sample = buffer))
+				.catch(() => {});
 		}
 		if (audio.state === 'suspended') audio.resume();
 	}
 
 	/** `closing` is how fast the two balls met; `u`, `v` is where, so it pans across the table. */
 	function clack(closing: number, u: number, v: number) {
-		if (!audio || !master || !noise || audio.state !== 'running' || closing < 0.08) return;
+		if (!audio || !master || !sample || audio.state !== 'running' || closing < 0.08) return;
 		const now = audio.currentTime;
 		// A break sets off a dozen collisions at once; a few voices are plenty.
 		voices = voices.filter((time) => now - time < 0.04);
@@ -185,8 +190,8 @@
 		voices.push(now);
 
 		const level = Math.min(1, closing / 4);
-		const peak = 0.7 * level ** 1.2 + 0.01;
 		const out = audio.createGain();
+		out.gain.value = 0.02 + 0.98 * level ** 1.5;
 		const across = portrait ? v : u / aspect;
 		if (audio.createStereoPanner) {
 			const pan = audio.createStereoPanner();
@@ -194,29 +199,16 @@
 			out.connect(pan).connect(master);
 		} else out.connect(master);
 
+		// A gentle touch has less of the sharp click in it than a hard hit.
+		const tone = audio.createBiquadFilter();
+		tone.type = 'lowpass';
+		tone.frequency.value = 3500 + level * 16000;
+
 		const source = audio.createBufferSource();
-		source.buffer = noise;
-		source.playbackRate.value = 0.9 + Math.random() * 0.2;
-		const band = audio.createBiquadFilter();
-		band.type = 'bandpass';
-		band.frequency.value = 2600 + level * 1200 + Math.random() * 400;
-		band.Q.value = 1.6;
-		const knock = audio.createGain();
-		knock.gain.setValueAtTime(peak, now);
-		knock.gain.exponentialRampToValueAtTime(0.001, now + 0.045);
-		source.connect(band).connect(knock).connect(out);
-
-		const tone = audio.createOscillator();
-		tone.frequency.value = 1850 + level * 500 + Math.random() * 150;
-		const ring = audio.createGain();
-		ring.gain.setValueAtTime(peak * 0.5, now);
-		ring.gain.exponentialRampToValueAtTime(0.001, now + 0.03);
-		tone.connect(ring).connect(out);
-
+		source.buffer = sample;
+		source.playbackRate.value = 0.94 + Math.random() * 0.1 + level * 0.04;
+		source.connect(tone).connect(out);
 		source.start(now);
-		source.stop(now + 0.06);
-		tone.start(now);
-		tone.stop(now + 0.05);
 	}
 
 	function rackBalls() {
