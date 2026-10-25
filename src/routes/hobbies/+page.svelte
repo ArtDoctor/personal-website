@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { onMount } from 'svelte';
 	import PoolTable from '$lib/components/pool/PoolTable.svelte';
 	import { ballBackground } from '$lib/components/pool/pool';
 	import { reveal } from '$lib/actions/reveal';
@@ -7,10 +8,13 @@
 
 	/** Fewest shots anyone has cleared the table in, on this browser. */
 	const BEST = 'pool-best';
+	/** Set when the table's sound has been switched on, on this browser. It starts off. */
+	const SOUND = 'pool-sound';
 
 	let potted = $state(hobbies.map(() => false));
 	let played = $state(false);
 	let table: PoolTable | undefined = $state();
+	let muted = $state(true);
 	let result = $state<{ shots: number; seconds: number; best: number; record: boolean } | null>(
 		null
 	);
@@ -33,6 +37,24 @@
 			}
 		}
 		result = { shots, seconds, best: record ? shots : previous, record };
+	}
+
+	onMount(() => {
+		try {
+			muted = localStorage.getItem(SOUND) !== '1';
+		} catch {
+			// No storage: sound stays off.
+		}
+	});
+
+	function toggleSound() {
+		muted = !muted;
+		try {
+			if (muted) localStorage.removeItem(SOUND);
+			else localStorage.setItem(SOUND, '1');
+		} catch {
+			// Remembered for this visit only.
+		}
 	}
 
 	function rerack() {
@@ -78,6 +100,7 @@
 				labels={hobbies}
 				felt="#1d5a45"
 				trim="#ff4f1a"
+				{muted}
 				onpot={(index) => (potted[index] = true)}
 				onshot={() => (played = true)}
 				onclear={cleared}
@@ -127,6 +150,9 @@
 					>Break <span>→</span></button
 				>
 				<button type="button" class="btn" onclick={rerack}>Rack 'em again</button>
+				<button type="button" class="btn" onclick={toggleSound}
+					>{muted ? 'Sound: off' : 'Sound: on'}</button
+				>
 			</div>
 		</div>
 	</div>

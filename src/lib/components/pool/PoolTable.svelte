@@ -15,9 +15,19 @@
 		felt?: string;
 		/** Colour of the rail sights and the cue. */
 		trim?: string;
+		/** No clack when balls collide. */
+		muted?: boolean;
 	};
 
-	let { labels, onpot, onshot, onclear, felt = '#178a5c', trim = '#ffd12e' }: Props = $props();
+	let {
+		labels,
+		onpot,
+		onshot,
+		onclear,
+		felt = '#178a5c',
+		trim = '#ffd12e',
+		muted = false
+	}: Props = $props();
 
 	let canvas: HTMLCanvasElement;
 
@@ -164,6 +174,7 @@
 	let voices: number[] = [];
 
 	function wakeAudio() {
+		if (muted) return;
 		if (!audio) {
 			if (typeof AudioContext === 'undefined') return;
 			const context = new AudioContext();
@@ -182,7 +193,9 @@
 
 	/** `closing` is how fast the two balls met; `u`, `v` is where, so it pans across the table. */
 	function clack(closing: number, u: number, v: number) {
-		if (!audio || !master || !sample || audio.state !== 'running' || closing < 0.08) return;
+		if (muted || !audio || !master || !sample || audio.state !== 'running' || closing < 0.08) {
+			return;
+		}
 		const now = audio.currentTime;
 		// A break sets off a dozen collisions at once; a few voices are plenty.
 		voices = voices.filter((time) => now - time < 0.04);
