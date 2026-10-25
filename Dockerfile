@@ -1,5 +1,5 @@
-# Use Bun official image
-FROM oven/bun:alpine as builder
+# Use Bun official image; 1.4.4 is the first release with the Brotli fix for CVE-2026-111497
+FROM oven/bun:1.4.4-alpine AS builder
 
 # Set working directory
 WORKDIR /app
@@ -17,7 +17,7 @@ COPY . .
 RUN bun run build
 
 # ---- Production Image ----
-FROM oven/bun:alpine AS runner
+FROM oven/bun:1.4.4-alpine AS runner
 
 WORKDIR /app
 
