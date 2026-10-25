@@ -45,6 +45,11 @@
 	const RAIL = '#111114';
 	const CHALK = '#fbfaf5';
 
+	// Ball markings, on a sphere of radius 1: the stripe is the band |y| < STRIPE, and the
+	// number sits in a white disc at each end of the z axis.
+	const STRIPE = 0.56;
+	const DISC = Math.sqrt(1 - 0.5 ** 2);
+
 	type Ball = {
 		id: number;
 		u: number;
@@ -55,6 +60,10 @@
 		sinking: number;
 		pocket: number;
 		gone: boolean;
+		/** Rotation from the ball's own frame to the table's (u, v, up), row-major. */
+		turn: number[];
+		/** Has rolled since its picture was last painted. */
+		rolled: boolean;
 	};
 
 	type Toast = { text: string; u: number; v: number; age: number };
@@ -78,17 +87,156 @@
 	let toasts: Toast[] = [];
 	let confetti: Scrap[] = [];
 	let aspect = 2;
+	/** A tall table, drawn with its long axis running bottom to top. */
+	let portrait = false;
 	let hasShot = false;
 	let shots = 0;
 	let firstShotAt = 0;
 	/** When the table was cleared, in seconds on the animation clock, or -1 while it is not. */
 	let clearedAt = -1;
 
+	/** Number up, turned any which way, the way a rack never quite lines up. */
+	function randomTurn(): number[] {
+		const angle = Math.random() * Math.PI * 2;
+		const c = Math.cos(angle);
+		const s = Math.sin(angle);
+		return [c, -s, 0, s, c, 0, 0, 0, 1];
+	}
+
+	/** Rolls a ball without slipping along (du, dv): it turns about the axis across its path. */
+	function roll(ball: Ball, du: number, dv: number) {
+		const length = Math.hypot(du, dv);
+		if (length === 0) return;
+		const kx = -dv / length;
+		const ky = du / length;
+		const c = Math.cos(length / RADIUS);
+		const s = Math.sin(length / RADIUS);
+		const t = 1 - c;
+		const r = [
+			c + t * kx * kx,
+			t * kx * ky,
+			s * ky,
+			t * kx * ky,
+			c + t * ky * ky,
+			-s * kx,
+			-s * ky,
+			s * kx,
+			c
+		];
+		const m = ball.turn;
+		const next = new Array<number>(9);
+		for (let row = 0; row < 3; row++) {
+			for (let col = 0; col < 3; col++) {
+				next[row * 3 + col] =
+					r[row * 3] * m[col] + r[row * 3 + 1] * m[3 + col] + r[row * 3 + 2] * m[6 + col];
+			}
+		}
+		// Thousands of small turns drift; straighten the columns back up.
+		const ax = Math.hypot(next[0], next[3], next[6]);
+		next[0] /= ax;
+		next[3] /= ax;
+		next[6] /= ax;
+		const dot = next[0] * next[1] + next[3] * next[4] + next[6] * next[7];
+		next[1] -= dot * next[0];
+		next[4] -= dot * next[3];
+		next[7] -= dot * next[6];
+		const ay = Math.hypot(next[1], next[4], next[7]);
+		next[1] /= ay;
+		next[4] /= ay;
+		next[7] /= ay;
+		next[2] = next[3] * next[7] - next[6] * next[4];
+		next[5] = next[6] * next[1] - next[0] * next[7];
+		next[8] = next[0] * next[4] - next[3] * next[1];
+		ball.turn = next;
+		ball.rolled = true;
+	}
+
+	/*
+	 * The clack of two balls, made up on the spot: a burst of noise through a bright band-pass
+	 * for the knock, and a short high tone for the ring of hard resin. Audio can only start
+	 * from a click or a tap, so it wakes on the first shot.
+	 */
+	let audio: AudioContext | null = null;
+	let master: GainNode | null = null;
+	let noise: AudioBuffer | null = null;
+	let voices: number[] = [];
+
+	function wakeAudio() {
+		if (!audio) {
+			if (typeof AudioContext === 'undefined') return;
+			audio = new AudioContext();
+			master = audio.createGain();
+			master.gain.value = 0.5;
+			master.connect(audio.destination);
+			noise = audio.createBuffer(1, Math.ceil(audio.sampleRate * 0.06), audio.sampleRate);
+			const samples = noise.getChannelData(0);
+			for (let i = 0; i < samples.length; i++) samples[i] = Math.random() * 2 - 1;
+		}
+		if (audio.state === 'suspended') audio.resume();
+	}
+
+	/** `closing` is how fast the two balls met; `u`, `v` is where, so it pans across the table. */
+	function clack(closing: number, u: number, v: number) {
+		if (!audio || !master || !noise || audio.state !== 'running' || closing < 0.08) return;
+		const now = audio.currentTime;
+		// A break sets off a dozen collisions at once; a few voices are plenty.
+		voices = voices.filter((time) => now - time < 0.04);
+		if (voices.length >= 4) return;
+		voices.push(now);
+
+		const level = Math.min(1, closing / 4);
+		const peak = 0.7 * level ** 1.2 + 0.01;
+		const out = audio.createGain();
+		const across = portrait ? v : u / aspect;
+		if (audio.createStereoPanner) {
+			const pan = audio.createStereoPanner();
+			pan.pan.value = (across * 2 - 1) * 0.6;
+			out.connect(pan).connect(master);
+		} else out.connect(master);
+
+		const source = audio.createBufferSource();
+		source.buffer = noise;
+		source.playbackRate.value = 0.9 + Math.random() * 0.2;
+		const band = audio.createBiquadFilter();
+		band.type = 'bandpass';
+		band.frequency.value = 2600 + level * 1200 + Math.random() * 400;
+		band.Q.value = 1.6;
+		const knock = audio.createGain();
+		knock.gain.setValueAtTime(peak, now);
+		knock.gain.exponentialRampToValueAtTime(0.001, now + 0.045);
+		source.connect(band).connect(knock).connect(out);
+
+		const tone = audio.createOscillator();
+		tone.frequency.value = 1850 + level * 500 + Math.random() * 150;
+		const ring = audio.createGain();
+		ring.gain.setValueAtTime(peak * 0.5, now);
+		ring.gain.exponentialRampToValueAtTime(0.001, now + 0.03);
+		tone.connect(ring).connect(out);
+
+		source.start(now);
+		source.stop(now + 0.06);
+		tone.start(now);
+		tone.stop(now + 0.05);
+	}
+
 	function rackBalls() {
 		const count = labels.length;
 		const spacing = RADIUS * 2.04;
 		const rows = [1, 2, 3, 3, 2];
-		balls = [{ id: 0, u: aspect * 0.24, v: 0.5, du: 0, dv: 0, sinking: 0, pocket: 0, gone: false }];
+		balls = [
+			{
+				id: 0,
+				u: aspect * 0.24,
+				v: 0.5,
+				du: 0,
+				dv: 0,
+				sinking: 0,
+				pocket: 0,
+				gone: false,
+				turn: randomTurn(),
+				rolled: true
+			}
+		];
 
 		let id = 1;
 		rows.forEach((size, row) => {
@@ -101,7 +249,9 @@
 					dv: 0,
 					sinking: 0,
 					pocket: 0,
-					gone: false
+					gone: false,
+					turn: randomTurn(),
+					rolled: true
 				});
 			}
 		});
@@ -121,6 +271,7 @@
 	export function breakShot() {
 		const cue = balls[0];
 		if (!cue || cue.sinking) return;
+		wakeAudio();
 
 		let nearest: Ball | null = null;
 		for (const ball of balls) {
@@ -249,6 +400,7 @@
 			}
 			ball.u += ball.du * dt;
 			ball.v += ball.dv * dt;
+			roll(ball, ball.du * dt, ball.dv * dt);
 
 			const hole = holes.findIndex(([pu, pv]) => Math.hypot(ball.u - pu, ball.v - pv) < POCKET);
 			if (hole >= 0) {
@@ -301,6 +453,7 @@
 				// Equal masses: swap the velocity components along the line of centres.
 				const closing = (a.du - b.du) * ux + (a.dv - b.dv) * uy;
 				if (closing <= 0) continue;
+				clack(closing, (a.u + b.u) / 2, (a.v + b.v) / 2);
 				const impulse = (closing * (1 + BALL_BOUNCE)) / 2;
 				a.du -= impulse * ux;
 				a.dv -= impulse * uy;
@@ -333,7 +486,6 @@
 		let width = 0;
 		let height = 0;
 		let dpr = 1;
-		let portrait = false;
 		let rail = 0;
 		let unit = 1;
 
@@ -376,6 +528,124 @@
 			return portrait ? [aspect - y, x] : [x, y];
 		}
 
+		/*
+		 * Each ball is painted pixel by pixel as a sphere seen from straight above: every pixel
+		 * is turned back into the ball's own frame to see whether it lands on the stripe, the
+		 * number disc or the digit. The picture is only repainted after the ball has rolled.
+		 */
+		type Picture = { canvas: HTMLCanvasElement; image: ImageData; portrait: boolean };
+		const pictures = new WeakMap<Ball, Picture>();
+		const GLYPH = 64;
+		const glyphs = new Map<number, Uint8ClampedArray>();
+
+		function rgb(hex: string): [number, number, number] {
+			const n = parseInt(hex.slice(1), 16);
+			return [n >> 16, (n >> 8) & 255, n & 255];
+		}
+		const chalk = rgb(CHALK);
+		const ink = rgb(RAIL);
+
+		/** The digit's coverage over the number disc, which spans GLYPH pixels per ball radius. */
+		function glyph(id: number): Uint8ClampedArray {
+			let mask = glyphs.get(id);
+			if (mask) return mask;
+			const scratch = document.createElement('canvas');
+			scratch.width = scratch.height = GLYPH;
+			const g = scratch.getContext('2d')!;
+			g.font = `800 ${GLYPH * 0.72}px ${family}`;
+			g.textAlign = 'center';
+			g.textBaseline = 'middle';
+			g.fillText(String(id), GLYPH / 2, GLYPH * 0.55);
+			const pixels = g.getImageData(0, 0, GLYPH, GLYPH).data;
+			mask = new Uint8ClampedArray(GLYPH * GLYPH);
+			for (let i = 0; i < mask.length; i++) mask[i] = pixels[i * 4 + 3];
+			glyphs.set(id, mask);
+			return mask;
+		}
+
+		function picture(ball: Ball): HTMLCanvasElement {
+			const size = Math.max(8, Math.ceil(RADIUS * unit * dpr * 2));
+			let pic = pictures.get(ball);
+			if (!pic || pic.canvas.width !== size || pic.portrait !== portrait) {
+				const canvas = document.createElement('canvas');
+				canvas.width = canvas.height = size;
+				pic = { canvas, image: new ImageData(size, size), portrait };
+				pictures.set(ball, pic);
+			} else if (!ball.rolled) return pic.canvas;
+			paint(ball, pic.image);
+			pic.canvas.getContext('2d')!.putImageData(pic.image, 0, 0);
+			ball.rolled = false;
+			return pic.canvas;
+		}
+
+		function paint(ball: Ball, image: ImageData) {
+			const style = ball.id === 0 ? null : BALLS[(ball.id - 1) % BALLS.length];
+			const colour = style ? rgb(style.color) : chalk;
+			const mask = style ? glyph(ball.id) : null;
+			const m = ball.turn;
+			const data = image.data;
+			const half = image.width / 2;
+			// About a pixel, for soft edges on the markings.
+			const edge = 1 / half;
+
+			let i = 0;
+			for (let py = 0; py < image.height; py++) {
+				for (let px = 0; px < image.width; px++, i += 4) {
+					let x = (px + 0.5 - half) / half;
+					let y = (py + 0.5 - half) / half;
+					// Corners outside the ball repeat its rim, so the clip has colour to cut.
+					const reach = x * x + y * y;
+					if (reach > 1) {
+						x /= Math.sqrt(reach);
+						y /= Math.sqrt(reach);
+					}
+					const z = Math.sqrt(Math.max(0, 1 - x * x - y * y));
+					const u = portrait ? -y : x;
+					const v = portrait ? x : y;
+					const bx = m[0] * u + m[3] * v + m[6] * z;
+					const by = m[1] * u + m[4] * v + m[7] * z;
+					const bz = m[2] * u + m[5] * v + m[8] * z;
+
+					let r = colour[0];
+					let g = colour[1];
+					let b = colour[2];
+					if (style) {
+						if (style.stripe) {
+							const band = clamp((STRIPE - Math.abs(by)) / edge + 0.5);
+							r = chalk[0] + (r - chalk[0]) * band;
+							g = chalk[1] + (g - chalk[1]) * band;
+							b = chalk[2] + (b - chalk[2]) * band;
+						}
+						const disc = clamp((Math.abs(bz) - DISC) / (edge * 0.6) + 0.5);
+						if (disc > 0) {
+							r += (chalk[0] - r) * disc;
+							g += (chalk[1] - g) * disc;
+							b += (chalk[2] - b) * disc;
+							// The far disc is seen from the other side; flip it so it reads the right way.
+							const gx = Math.floor(((bz > 0 ? bx : -bx) + 0.5) * GLYPH);
+							const gy = Math.floor((by + 0.5) * GLYPH);
+							if (mask && gx >= 0 && gx < GLYPH && gy >= 0 && gy < GLYPH) {
+								const digit = (mask[gy * GLYPH + gx] / 255) * disc;
+								r += (ink[0] - r) * digit;
+								g += (ink[1] - g) * digit;
+								b += (ink[2] - b) * digit;
+							}
+						}
+					}
+					// A little darker towards the rim, so it reads as round while it rolls.
+					const shade = 0.86 + 0.14 * z;
+					data[i] = r * shade;
+					data[i + 1] = g * shade;
+					data[i + 2] = b * shade;
+					data[i + 3] = 255;
+				}
+			}
+		}
+
+		function clamp(value: number) {
+			return value < 0 ? 0 : value > 1 ? 1 : value;
+		}
+
 		function drawBall(ball: Ball) {
 			const x = toX(ball.u, ball.v);
 			const y = toY(ball.u, ball.v);
@@ -387,30 +657,12 @@
 			ctx.ellipse(x + r * 0.22, y + r * 0.3, r, r * 0.94, 0, 0, Math.PI * 2);
 			ctx.fill();
 
-			const style = ball.id === 0 ? null : BALLS[(ball.id - 1) % BALLS.length];
 			ctx.save();
 			ctx.beginPath();
 			ctx.arc(x, y, r, 0, Math.PI * 2);
 			ctx.clip();
-			ctx.fillStyle = !style || style.stripe ? CHALK : style.color;
-			ctx.fillRect(x - r, y - r, r * 2, r * 2);
-			if (style?.stripe) {
-				ctx.fillStyle = style.color;
-				ctx.fillRect(x - r, y - r * 0.56, r * 2, r * 1.12);
-			}
+			ctx.drawImage(picture(ball), x - r, y - r, r * 2, r * 2);
 			ctx.restore();
-
-			if (style) {
-				ctx.fillStyle = CHALK;
-				ctx.beginPath();
-				ctx.arc(x, y, r * 0.5, 0, Math.PI * 2);
-				ctx.fill();
-				ctx.fillStyle = RAIL;
-				ctx.font = `800 ${r * 0.72}px ${family}`;
-				ctx.textAlign = 'center';
-				ctx.textBaseline = 'middle';
-				ctx.fillText(String(ball.id), x, y + r * 0.05);
-			}
 
 			ctx.fillStyle = 'rgba(255, 255, 255, 0.38)';
 			ctx.beginPath();
@@ -637,6 +889,7 @@
 		function down(event: PointerEvent) {
 			const cue = balls[0];
 			if (!cue || cue.sinking) return;
+			wakeAudio();
 			aiming = true;
 			canvas.setPointerCapture(event.pointerId);
 			move(event);
