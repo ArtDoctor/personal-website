@@ -30,7 +30,7 @@
 	</p>
 	<h1>Solar Filaments</h1>
 	<p class="intro">{solar.task}</p>
-	<p class="status mono"><i></i>Kaggle · {solar.competition} · in progress</p>
+	<p class="status mono">Kaggle · {solar.competition} · closed {solar.closed}</p>
 </section>
 
 <section class="band">
@@ -73,7 +73,7 @@
 		</div>
 		<div>
 			<dd>{solar.history.length}</dd>
-			<dt class="mono">submissions in three days</dt>
+			<dt class="mono">submissions in eight days</dt>
 		</div>
 		<div>
 			<dd>707</dd>
@@ -103,7 +103,7 @@
 <section class="band">
 	<header class="head" use:reveal>
 		<span class="num mono">02</span>
-		<h2>The climb so far.</h2>
+		<h2>The climb.</h2>
 		<p class="lede">Every submission, in order. Not every idea was a good one.</p>
 	</header>
 
@@ -130,22 +130,22 @@
 <section class="band" data-tone="dark">
 	<header class="head" use:reveal>
 		<span class="num mono">03</span>
-		<h2>The code.</h2>
+		<h2>Code and report.</h2>
 		<p class="lede">
-			{solar.github
-				? 'The full pipeline, with every experiment that worked and every one that did not.'
-				: 'The repository goes public once the competition allows it. Until then, the competition page has the task and the data.'}
+			About 800 lines of Python, the trained weights and a notebook that runs every step. The
+			four-page report has the method, the validation and the dead ends. One finding from it: on
+			images no model saw, the pipeline scores 0.46 against each expert, and the experts score 0.34
+			against each other.
 		</p>
 	</header>
 
 	<div class="buttons">
-		{#if solar.github}
-			<a href={solar.github} target="_blank" rel="noopener noreferrer" class="btn solid">
-				Code on GitHub <span>↗</span>
-			</a>
-		{:else}
-			<span class="btn" aria-disabled="true">Code on GitHub · coming</span>
-		{/if}
+		<a href={solar.github} target="_blank" rel="noopener noreferrer" class="btn solid">
+			Code on GitHub <span>↗</span>
+		</a>
+		<a href={solar.report} target="_blank" rel="noopener noreferrer" class="btn">
+			The report · PDF <span>↗</span>
+		</a>
 		<a href={solar.kaggle} target="_blank" rel="noopener noreferrer" class="btn">
 			The competition <span>↗</span>
 		</a>
@@ -161,26 +161,8 @@
 
 <style>
 	.status {
-		display: flex;
-		align-items: center;
-		gap: 10px;
 		margin-top: 22px;
 		color: var(--dim);
-	}
-
-	/* A slow pulse: the competition is still running. */
-	.status i {
-		width: 7px;
-		height: 7px;
-		border-radius: 50%;
-		background: var(--hot);
-		animation: pulse 1.8s ease-in-out infinite;
-	}
-
-	@keyframes pulse {
-		50% {
-			opacity: 0.25;
-		}
 	}
 
 	.closeup {

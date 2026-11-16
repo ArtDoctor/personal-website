@@ -30,8 +30,18 @@
 		)
 	);
 
+	// Days can be one submission apart, so a label is skipped when it would run into the one before.
+	const dayLabels = $derived.by(() => {
+		let previous = -Infinity;
+		return days.filter(({ i }) => {
+			if (x(i) - previous < 46) return false;
+			previous = x(i);
+			return true;
+		});
+	});
+
 	let hovered = $state<number | null>(null);
-	const last = points.length - 1;
+	const final = points.findIndex((point) => point.final);
 
 	function nearest(event: PointerEvent) {
 		const box = (event.currentTarget as SVGElement).getBoundingClientRect();
@@ -50,7 +60,7 @@
 			{width}
 			{height}
 			role="img"
-			aria-label={`Public leaderboard score over ${points.length} submissions, from ${points[0].score.toFixed(2)} to ${points[last].score.toFixed(2)}`}
+			aria-label={`Public leaderboard score over ${points.length} submissions, from ${points[0].score.toFixed(2)} to ${points[final].score.toFixed(2)} for the final pick`}
 			onpointermove={nearest}
 			onpointerleave={() => (hovered = null)}
 		>
@@ -73,7 +83,7 @@
 				</text>
 			{/each}
 
-			{#each days as { i, day }}
+			{#each days as { i }}
 				<line
 					class="gridline"
 					x1={x(i)}
@@ -81,6 +91,9 @@
 					y1={height - margin.bottom}
 					y2={height - margin.bottom + 6}
 				/>
+			{/each}
+
+			{#each dayLabels as { i, day }}
 				<text class="tick" x={x(i)} y={height - margin.bottom + 22}>{day}</text>
 			{/each}
 
@@ -99,19 +112,19 @@
 			{#each points as point, i}
 				<circle
 					class="dot"
-					class:best={i === last}
+					class:best={i === final}
 					cx={x(i)}
 					cy={y(point.score)}
-					r={hovered === i ? 6 : i === last ? 5 : 4}
+					r={hovered === i ? 6 : i === final ? 5 : 4}
 				/>
 			{/each}
 
-			<!-- Only the two ends are labelled; the rest is on hover and in the table below. -->
+			<!-- Only the first and the final pick are labelled; the rest is on hover and in the table below. -->
 			<text class="value" x={x(0)} y={y(points[0].score) - 14} text-anchor="start"
 				>{points[0].score.toFixed(2)}</text
 			>
-			<text class="value" x={x(last) + 12} y={y(points[last].score)} dominant-baseline="middle">
-				{points[last].score.toFixed(2)}
+			<text class="value" x={x(final)} y={y(points[final].score) - 14} text-anchor="middle">
+				{points[final].score.toFixed(2)}
 			</text>
 		</svg>
 

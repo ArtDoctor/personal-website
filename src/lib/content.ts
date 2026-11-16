@@ -84,7 +84,7 @@ export const projects: Project[] = [
 		slug: 'solar',
 		title: 'Solar Filaments',
 		description:
-			'A Kaggle competition: find every filament on full-disk images of the Sun and draw its exact outline. A detector proposes, a small U-Net draws, five models vote. Top 10% right now.',
+			'A Kaggle competition: find every filament on full-disk images of the Sun and draw its exact outline. A detector proposes, a small U-Net draws, four models vote. Top 11% on the public leaderboard; the code and a short report are public.',
 		stack: 'YOLO · U-Net · instance segmentation',
 		link: 'https://www.kaggle.com/competitions/filament-segmentation-2026',
 		linkLabel: 'Kaggle',
@@ -387,10 +387,13 @@ export const kolo = {
 export const solar = {
 	competition: 'Filament Segmentation 2026',
 	kaggle: 'https://www.kaggle.com/competitions/filament-segmentation-2026',
-	/** Add the repository link here once the competition allows sharing the code. */
-	github: null as string | null,
-	standing: 'Top 10%',
-	standingNote: 'on the public leaderboard, October 2026. The competition runs until 15 November.',
+	github: 'https://github.com/ArtDoctor/solar-kaggle-public',
+	/** A copy of report/report.pdf from that repository, in static/papers. */
+	report: '/papers/solar-filaments-report.pdf',
+	closed: '15 November 2026',
+	standing: 'Top 11%',
+	standingNote:
+		'133rd of 1,278 on the public leaderboard, 30 October 2026. The competition closed on 15 November.',
 	score: 0.4,
 	task: 'Given a 2048 × 2048 image of the Sun in H-alpha light, find every filament and draw its exact outline, one mask per filament.',
 	why: 'Filaments are dense clouds of solar material held above the surface by magnetic fields. They sit at the core of solar eruptions, so finding them automatically matters for space-weather forecasting.',
@@ -405,12 +408,12 @@ export const solar = {
 		},
 		{
 			title: 'Vote',
-			text: 'Five detectors look at the same image and vote on which masks to keep.'
+			text: 'Four detectors look at the same image and vote on which masks to keep.'
 		}
 	],
 	failed:
 		'What did not work: classic image processing. Thresholding the dark regions found 510 real filaments and 4,415 things that were not.',
-	/** Public leaderboard score of each submission, in order. */
+	/** Public leaderboard score of each submission, in order. `final` marks the one selected for the private board. */
 	history: [
 		{ day: 'Oct 9', score: 0.35, note: 'First two-stage baseline' },
 		{ day: 'Oct 9', score: 0.33, note: 'Stricter thresholds' },
@@ -424,7 +427,17 @@ export const solar = {
 		{ day: 'Oct 11', score: 0.39, note: 'Five-detector ensemble' },
 		{ day: 'Oct 11', score: 0.38, note: 'Probe: keep more masks' },
 		{ day: 'Oct 11', score: 0.39, note: 'Probe: keep fewer masks' },
-		{ day: 'Oct 11', score: 0.4, note: 'Rank-averaged scores' }
+		{ day: 'Oct 11', score: 0.4, note: 'Rank-averaged scores' },
+		{ day: 'Oct 11', score: 0.4, note: 'Probe: slightly larger masks' },
+		{ day: 'Oct 13', score: 0.4, note: 'Masks averaged with a retrained model' },
+		{ day: 'Oct 14', score: 0.4, note: 'Rebuilt simpler: four detectors, one mask model' },
+		{
+			day: 'Oct 15',
+			score: 0.4,
+			note: 'Clean rewrite, trained from scratch: my final pick',
+			final: true
+		},
+		{ day: 'Oct 16', score: 0.39, note: 'Probe: one detector instead of four' }
 	],
 	credit: 'Image: GONG H-alpha, National Solar Observatory. Expert outlines: the MAGFiLO dataset.'
 };
