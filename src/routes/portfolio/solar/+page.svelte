@@ -69,7 +69,7 @@
 		</div>
 		<div>
 			<dd>{solar.score.toFixed(2)}</dd>
-			<dt class="mono">panoptic quality, public leaderboard</dt>
+			<dt class="mono">panoptic quality, private leaderboard ({solar.publicScore.toFixed(2)} public)</dt>
 		</div>
 		<div>
 			<dd>{solar.history.length}</dd>
@@ -88,6 +88,21 @@
 		<h2>How it works.</h2>
 		<p class="lede">{solar.failed}</p>
 	</header>
+
+	<figure class="pipeline rise" use:reveal>
+		<div class="pipeline-scroll">
+			<img
+				src="/images/projects/solar-pipeline.webp"
+				alt="Solar filament segmentation pipeline: 8 views of full-disk images, 4 YOLO26s detectors fused with WBF, box prompt and full-resolution crop, U-Net with ResNet18 encoder and skip connections, probability map, candidate merging, and pixel-disjoint instance selection."
+				loading="lazy"
+				width="2130"
+				height="444"
+			/>
+		</div>
+		<figcaption class="mono">
+			fig. 3 · the pipeline from left to right: multi-view detection, box-prompted segmentation, and greedy selection without overlap.
+		</figcaption>
+	</figure>
 
 	<ol class="steps">
 		{#each solar.approach as step, i}
@@ -130,12 +145,12 @@
 <section class="band" data-tone="dark">
 	<header class="head" use:reveal>
 		<span class="num mono">03</span>
-		<h2>Code and report.</h2>
+		<h2>Code, report and write-up.</h2>
 		<p class="lede">
 			About 800 lines of Python, the trained weights and a notebook that runs every step. The
-			four-page report has the method, the validation and the dead ends. One finding from it: on
-			images no model saw, the pipeline scores 0.46 against each expert, and the experts score 0.34
-			against each other.
+			four-page report and Kaggle write-up cover the method, validation and dead ends. One finding
+			from it: on images no model saw, the pipeline scores 0.46 against each expert, and the experts
+			score 0.34 against each other.
 		</p>
 	</header>
 
@@ -145,6 +160,9 @@
 		</a>
 		<a href={solar.report} target="_blank" rel="noopener noreferrer" class="btn">
 			The report · PDF <span>↗</span>
+		</a>
+		<a href={solar.writeup} target="_blank" rel="noopener noreferrer" class="btn">
+			Kaggle write-up <span>↗</span>
 		</a>
 		<a href={solar.kaggle} target="_blank" rel="noopener noreferrer" class="btn">
 			The competition <span>↗</span>
@@ -168,6 +186,27 @@
 	.closeup {
 		max-width: 24rem;
 		margin-top: clamp(28px, 4vw, 48px);
+	}
+
+	.pipeline {
+		margin: 0 0 clamp(36px, 5.5vw, 64px);
+	}
+
+	.pipeline-scroll {
+		width: 100%;
+		overflow-x: auto;
+		-webkit-overflow-scrolling: touch;
+	}
+
+	.pipeline-scroll img {
+		display: block;
+		width: 100%;
+		min-width: 640px;
+		height: auto;
+	}
+
+	.pipeline figcaption {
+		margin-top: 14px;
 	}
 
 	.credit {

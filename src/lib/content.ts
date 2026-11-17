@@ -84,7 +84,7 @@ export const projects: Project[] = [
 		slug: 'solar',
 		title: 'Solar Filaments',
 		description:
-			'A Kaggle competition: find every filament on full-disk images of the Sun and draw its exact outline. A detector proposes, a small U-Net draws, four models vote. Top 11% on the public leaderboard; the code and a short report are public.',
+			'A Kaggle competition: find every filament on full-disk images of the Sun and draw its exact outline. A detector proposes, a small U-Net draws, four models vote. Top 9% on the final leaderboard; the code, report and Kaggle write-up are public.',
 		stack: 'YOLO · U-Net · instance segmentation',
 		link: 'https://www.kaggle.com/competitions/filament-segmentation-2026',
 		linkLabel: 'Kaggle',
@@ -387,14 +387,18 @@ export const kolo = {
 export const solar = {
 	competition: 'Filament Segmentation 2026',
 	kaggle: 'https://www.kaggle.com/competitions/filament-segmentation-2026',
+	writeup:
+		'https://www.kaggle.com/competitions/filament-segmentation-2026/writeups/detector-box-prompted-u-net',
 	github: 'https://github.com/ArtDoctor/solar-kaggle-public',
 	/** A copy of report/report.pdf from that repository, in static/papers. */
 	report: '/papers/solar-filaments-report.pdf',
 	closed: '15 November 2026',
-	standing: 'Top 11%',
+	standing: 'Top 9%',
 	standingNote:
-		'133rd of 1,278 on the public leaderboard, 30 October 2026. The competition closed on 15 November.',
-	score: 0.4,
+		'136th of 1,567 on the final leaderboard, November 2026. The competition closed on 15 November.',
+	score: 0.38,
+	publicScore: 0.4,
+	cvScore: 0.462,
 	task: 'Given a 2048 × 2048 image of the Sun in H-alpha light, find every filament and draw its exact outline, one mask per filament.',
 	why: 'Filaments are dense clouds of solar material held above the surface by magnetic fields. They sit at the core of solar eruptions, so finding them automatically matters for space-weather forecasting.',
 	approach: [
@@ -434,7 +438,7 @@ export const solar = {
 		{
 			day: 'Oct 15',
 			score: 0.4,
-			note: 'Clean rewrite, trained from scratch: my final pick',
+			note: 'Clean rewrite, trained from scratch: my final pick (0.38 private)',
 			final: true
 		},
 		{ day: 'Oct 16', score: 0.39, note: 'Probe: one detector instead of four' }
