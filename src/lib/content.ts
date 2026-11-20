@@ -84,7 +84,7 @@ export const projects: Project[] = [
 		slug: 'solar',
 		title: 'Solar Filaments',
 		description:
-			'A Kaggle competition: find every filament on full-disk images of the Sun and draw its exact outline. A detector proposes, a small U-Net draws, four models vote. Top 9% on the final leaderboard; the code, report and Kaggle write-up are public.',
+			'A Kaggle competition: find every filament on full-disk images of the Sun and draw its exact outline. A detector proposes, a small U-Net draws, four models vote. Top 2% in the final results; the code, report and Kaggle write-up are public.',
 		stack: 'YOLO · U-Net · instance segmentation',
 		link: 'https://www.kaggle.com/competitions/filament-segmentation-2026',
 		linkLabel: 'Kaggle',
@@ -393,9 +393,9 @@ export const solar = {
 	/** A copy of report/report.pdf from that repository, in static/papers. */
 	report: '/papers/solar-filaments-report.pdf',
 	closed: '15 November 2026',
-	standing: 'Top 9%',
+	standing: 'Top 2%',
 	standingNote:
-		'136th of 1,567 on the final leaderboard, November 2026. The competition closed on 15 November.',
+		'29th of 1,567 in the final results, November 2026. The competition closed on 15 November.',
 	score: 0.38,
 	publicScore: 0.4,
 	cvScore: 0.462,
